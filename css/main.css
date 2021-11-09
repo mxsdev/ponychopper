@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'loaders.css';
+
+/* :root {
+    --main-bg-gradient: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%);
+} */
+
+/* :root {
+    --col-acc-1: #B1FCFB;
+    --col-acc-2: #84B0AF;
+} */
+
+body {
+    background: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%) fixed;
+    background-repeat: no-repeat;
+    background-size: auto;
+}
+
+#waveform > wave {
+    overflow: hidden !important;
+}
+
+#waveform.loading > wave {
+    @apply !hidden;
+}
+
+.body-text {
+    @apply font-mono select-none
+}
+
+.filter-container {
+    > div {
+        @apply mb-2 p-2 rounded-sm
+    }
+
+    > div:nth-child(even) {
+        @apply bg-black bg-opacity-5
+    }
+
+    /* > div > div:nth-child(1) {
+        @apply flex-col w-1/5
+    }
+
+    > div > div:nth-child(2) {
+        @apply flex-col w-4/5
+    } */
+}
+
+a {
+    color: #84B0AF;
+}
+
+.desktop-menu-items > * {
+    @apply ml-2 mt-2
+} 
