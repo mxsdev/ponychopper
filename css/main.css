@@ -17,6 +17,7 @@ body {
     background: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%) fixed;
     background-repeat: no-repeat;
     background-size: auto;
+    @apply font-mono;
 }
 
 #waveform > wave {
@@ -36,7 +37,7 @@ body {
         @apply mb-2 p-2 rounded-sm
     }
 
-    > div:nth-child(even) {
+    > div:nth-child(odd) {
         @apply bg-black bg-opacity-5
     }
 

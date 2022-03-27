@@ -107,10 +107,10 @@ export default ((props) => {
         return chop_ids.map(cid => transformChop(cid))
     }
 
-    const [filterOpts, setFilterOpts] = useState<FilterOpts>({
+    const [filterOpts, setFilterOpts] = useLocalStorage<FilterOpts>('filterOpts', {
         // characters: listCharacters().map(c => c.key),
         characters: [ 'fs', 'aj', 'm6', 'pp', 'ra', 'rd', 'ts' ],
-        // characters: [ 'ra' ],
+        // characters: [ 'ra' ],`
 	    seasons: listSeasons(),
         songs: listSongs().map(ep => ep.key)
     })
@@ -120,8 +120,8 @@ export default ((props) => {
     function getFilteredTransformedChops(data: ChopsData) {
         return transformChops(data)
              .filter(chop => filterOpts.characters.includes(chop.character))
-            // .filter(chop => filterOpts.songs.includes(chop.song))
-            // .filter(chop => filterOpts.seasons.includes(chop.season))
+            .filter(chop => filterOpts.songs.includes(chop.song))
+            .filter(chop => filterOpts.seasons.includes(chop.season))
     }
 
     // useEffect(() => {
@@ -136,6 +136,10 @@ export default ((props) => {
 
         const chops = getFilteredTransformedChops(chopsData)
 
+        if(chops.length === 0) {
+            return
+        }
+
         loadChop(
             chops[Math.floor(Math.random()*chops.length)]
         )
@@ -145,7 +149,7 @@ export default ((props) => {
     useEffect(() => {
         registerHotkeys({ws, chop})
         return unregisterHotkeys
-    }, [ws, chopsData])
+    }, [ws, chopsData, filterOpts])
 
     // register global hotkeys
     const [ globalMode, setGlobalMode ] = useLocalStorage<boolean>('globalMode', config.desktop ? true : false)

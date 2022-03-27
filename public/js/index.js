@@ -100,6 +100,14 @@ exports["default"] = function (props) {
 "use strict";
 
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -128,6 +136,10 @@ var locale_1 = __webpack_require__(/*! locale */ "./app/locale.ts");
 
 var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
+var charaList = (0, locale_1.listCharacters)();
+var seasonList = (0, locale_1.listSeasons)();
+var songList = (0, locale_1.listSongs)();
+
 exports["default"] = function (_ref) {
   var filterOpts = _ref.filterOpts,
       updateFilterOpts = _ref.updateFilterOpts;
@@ -137,7 +149,30 @@ exports["default"] = function (_ref) {
       open = _ref3[0],
       setOpen = _ref3[1];
 
-  var charaList = (0, locale_1.listCharacters)();
+  var toggleCharacter = function toggleCharacter(id, toggled) {
+    updateFilterOpts({
+      characters: [].concat(_toConsumableArray(filterOpts.characters.filter(function (c) {
+        return c !== id;
+      })), _toConsumableArray(toggled ? [id] : []))
+    });
+  };
+
+  var toggleSeason = function toggleSeason(season, toggled) {
+    updateFilterOpts({
+      seasons: [].concat(_toConsumableArray(filterOpts.seasons.filter(function (s) {
+        return s !== season;
+      })), _toConsumableArray(toggled ? [season] : []))
+    });
+  };
+
+  var toggleSong = function toggleSong(song, toggled) {
+    updateFilterOpts({
+      songs: [].concat(_toConsumableArray(filterOpts.songs.filter(function (s) {
+        return s !== song;
+      })), _toConsumableArray(toggled ? [song] : []))
+    });
+  };
+
   return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("p", {
     className: "font-mono mt-4 text-left text-lg font-bold select-none hover:cursor-pointer",
     onClick: function onClick() {
@@ -145,14 +180,69 @@ exports["default"] = function (_ref) {
     }
   }, "Filter ", !open ? '▲' : '▼'), open ? react_1["default"].createElement("div", {
     className: 'filter-container'
-  }, react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement("p", {
-    className: "body-text"
-  }, "Character")), react_1["default"].createElement(FilterCol2, null, charaList.map(function (_char) {
-    return react_1["default"].createElement("div", {
-      className: "inline",
-      key: _char.key
-    }, react_1["default"].createElement("input", {
-      id: _char.key
+  }, react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement(FilterBox, {
+    key: 'characters',
+    id: 'characters',
+    onCheck: function onCheck(c) {
+      return updateFilterOpts({
+        characters: c ? charaList.map(function (c) {
+          return c.key;
+        }) : []
+      });
+    },
+    defaultChecked: true,
+    label: "Characters"
+  })), react_1["default"].createElement(FilterCol2, null, charaList.map(function (_char) {
+    return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(FilterBox, {
+      key: _char.key,
+      id: _char.key,
+      checked: filterOpts.characters.includes(_char.key),
+      onCheck: function onCheck(c) {
+        return toggleCharacter(_char.key, c);
+      },
+      label: _char.name
+    }));
+  }))), react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement(FilterBox, {
+    key: 'seasons',
+    id: 'seasons',
+    onCheck: function onCheck(c) {
+      return updateFilterOpts({
+        seasons: c ? seasonList : []
+      });
+    },
+    defaultChecked: true,
+    label: "Seasons"
+  })), react_1["default"].createElement(FilterCol2, null, seasonList.map(function (season) {
+    return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(FilterBox, {
+      key: season,
+      id: "season-".concat(season),
+      checked: filterOpts.seasons.includes(season),
+      onCheck: function onCheck(c) {
+        return toggleSeason(season, c);
+      },
+      label: season
+    }));
+  }))), react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement(FilterBox, {
+    key: 'songs',
+    id: 'songs',
+    onCheck: function onCheck(c) {
+      return updateFilterOpts({
+        songs: c ? songList.map(function (s) {
+          return s.key;
+        }) : []
+      });
+    },
+    defaultChecked: true,
+    label: "Songs"
+  })), react_1["default"].createElement(FilterCol2, null, songList.map(function (song) {
+    return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement(FilterBox, {
+      key: "song-".concat(song.key),
+      id: "song-".concat(song.key),
+      checked: filterOpts.songs.includes(song.key),
+      onCheck: function onCheck(c) {
+        return toggleSong(song.key, c);
+      },
+      label: song.name
     }));
   })))) : '');
 };
@@ -168,22 +258,44 @@ var FilterCheckbox = function FilterCheckbox(props) {
 var FilterRow = function FilterRow(_ref4) {
   var children = _ref4.children;
   return react_1["default"].createElement("div", {
-    className: 'flex'
+    className: 'flex justify-around'
   }, children);
 };
 
 var FilterCol1 = function FilterCol1(_ref5) {
   var children = _ref5.children;
   return react_1["default"].createElement("div", {
-    className: "flex-col w-1/5"
+    className: "flex-col w-36 flex-initial"
   }, children);
 };
 
 var FilterCol2 = function FilterCol2(_ref6) {
   var children = _ref6.children;
   return react_1["default"].createElement("div", {
-    className: "flex-col w-4/5"
+    className: "flex-col flex-1"
   }, children);
+};
+
+var FilterBox = function FilterBox(_ref7) {
+  var id = _ref7.id,
+      checked = _ref7.checked,
+      onCheck = _ref7.onCheck,
+      label = _ref7.label,
+      defaultChecked = _ref7.defaultChecked;
+  return react_1["default"].createElement("div", {
+    className: "inline-block select-none" + (label ? " mr-2" : "")
+  }, react_1["default"].createElement("input", {
+    id: id,
+    type: "checkbox",
+    checked: checked,
+    defaultChecked: defaultChecked,
+    onChange: function onChange(e) {
+      return onCheck(e.target.checked);
+    }
+  }), label ? react_1["default"].createElement("label", {
+    htmlFor: id,
+    className: "select-none ml-1"
+  }, label) : react_1["default"].createElement(react_1["default"].Fragment, null));
 };
 
 /***/ }),
@@ -1134,10 +1246,10 @@ exports["default"] = function (props) {
     });
   }
 
-  var _ref12 = (0, react_1.useState)({
+  var _ref12 = (0, helpers_1.useLocalStorage)('filterOpts', {
     // characters: listCharacters().map(c => c.key),
     characters: ['fs', 'aj', 'm6', 'pp', 'ra', 'rd', 'ts'],
-    // characters: [ 'ra' ],
+    // characters: [ 'ra' ],`
     seasons: (0, locale_1.listSeasons)(),
     songs: (0, locale_1.listSongs)().map(function (ep) {
       return ep.key;
@@ -1154,8 +1266,11 @@ exports["default"] = function (props) {
   function getFilteredTransformedChops(data) {
     return transformChops(data).filter(function (chop) {
       return filterOpts.characters.includes(chop.character);
-    }); // .filter(chop => filterOpts.songs.includes(chop.song))
-    // .filter(chop => filterOpts.seasons.includes(chop.season))
+    }).filter(function (chop) {
+      return filterOpts.songs.includes(chop.song);
+    }).filter(function (chop) {
+      return filterOpts.seasons.includes(chop.season);
+    });
   } // useEffect(() => {
   //     if(chopsData) {
   //         updateFilterOpts({characters: ['ra']})
@@ -1167,6 +1282,11 @@ exports["default"] = function (props) {
   var chop = function chop() {
     if (!chopsData) return;
     var chops = getFilteredTransformedChops(chopsData);
+
+    if (chops.length === 0) {
+      return;
+    }
+
     loadChop(chops[Math.floor(Math.random() * chops.length)]);
   }; // register hotkeys
 
@@ -1177,7 +1297,7 @@ exports["default"] = function (props) {
       chop: chop
     });
     return hotkeys_1.unregisterHotkeys;
-  }, [ws, chopsData]); // register global hotkeys
+  }, [ws, chopsData, filterOpts]); // register global hotkeys
 
   var _ref14 = (0, helpers_1.useLocalStorage)('globalMode', config_1["default"].desktop ? true : false),
       _ref15 = _slicedToArray(_ref14, 2),

@@ -1,5 +1,5 @@
 import { useLocalStorage } from "helpers"
-import { listCharacters } from "locale"
+import { Character, listCharacters, listSeasons, listSongs, Season, Song } from "locale"
 import { FilterOpts } from "main"
 import React, { FunctionComponent } from "react"
 
@@ -10,10 +10,40 @@ interface OwnProps {
 
 type Props = OwnProps
 
+const charaList = listCharacters()
+const seasonList = listSeasons()
+const songList = listSongs()
+
 export default (({ filterOpts, updateFilterOpts }) => {
     const [open, setOpen] = useLocalStorage<boolean>('filterOpen', false)
 
-    const charaList = listCharacters()
+
+    const toggleCharacter = (id: Character, toggled: boolean) => {
+        updateFilterOpts({
+             characters: [
+                ...filterOpts.characters.filter(c => c !== id),
+                ...(toggled ? [id] : [])
+            ] 
+        })
+    }
+
+    const toggleSeason = (season: Season, toggled: boolean) => {
+        updateFilterOpts({
+            seasons: [
+                ...filterOpts.seasons.filter(s => s !== season),
+                ...(toggled ? [season] : [])
+            ]
+        })
+    }
+
+    const toggleSong = (song: Song, toggled: boolean) => {
+        updateFilterOpts({
+            songs: [
+                ...filterOpts.songs.filter(s => s !== song),
+                ...(toggled ? [song] : [])
+            ]
+        })
+    }
 
     return (<>
         <p className="font-mono mt-4 text-left text-lg font-bold select-none hover:cursor-pointer" onClick={() => setOpen(!open)}>Filter {!open ? '▲' : '▼'}</p>
@@ -22,23 +52,91 @@ export default (({ filterOpts, updateFilterOpts }) => {
             <div className='filter-container'>
                 <FilterRow>
                     <FilterCol1>
-                        <p className="body-text">Character</p>
+                        <FilterBox 
+                            key={'characters'}
+                            id={'characters'}
+
+                            onCheck={(c) => updateFilterOpts({
+                                characters: c ? charaList.map(c => c.key) : []
+                            })}
+                            defaultChecked={true}
+
+                            label="Characters"
+                        />
                     </FilterCol1>
                     <FilterCol2>
-                        { charaList.map(char => (<div className="inline" key={char.key}>
-                            <input id={char.key} />
-
-                        </div>)) }
+                        { charaList.map(char => (<>
+                            <FilterBox 
+                                key={char.key} 
+                                id={char.key} 
+                                checked={filterOpts.characters.includes(char.key)}
+                                onCheck={(c) => toggleCharacter(char.key, c)}
+                                label={char.name}
+                            />
+                        </>)) }
                     </FilterCol2>
                 </FilterRow>
-                {/* <FilterRow>
+
+                <FilterRow>
                     <FilterCol1>
-                        <p className="body-text">Season</p>
+                        <FilterBox 
+                            key={'seasons'}
+                            id={'seasons'}
+
+                            onCheck={(c) => updateFilterOpts({
+                                seasons: c ? seasonList : []
+                            })}
+
+                            defaultChecked={true}
+
+                            label="Seasons"
+                        />
                     </FilterCol1>
                     <FilterCol2>
-                        <p className="body-text">Test2</p>
+                        { seasonList.map(season => (<>
+                            <FilterBox 
+                                key={season}
+                                id={`season-${season}`}
+
+                                checked={filterOpts.seasons.includes(season)}
+                                onCheck={(c) => toggleSeason(season, c)}
+
+                                label={season}
+                            />
+                        </>)) }
                     </FilterCol2>
-                </FilterRow> */}
+                </FilterRow>
+                
+                <FilterRow>
+                    <FilterCol1>
+                        <FilterBox 
+                            key={'songs'}
+                            id={'songs'}
+
+                            onCheck={(c) => updateFilterOpts({
+                                songs: c ? songList.map(s => s.key) : []
+                            })}
+
+                            defaultChecked={true}
+
+                            label="Songs"
+                        />
+                    </FilterCol1>
+                    <FilterCol2>
+                        { songList.map(song => (<>
+                            <FilterBox 
+                                key={`song-${song.key}`}
+                                id={`song-${song.key}`}
+
+                                checked={filterOpts.songs.includes(song.key)}
+
+                                onCheck={(c) => toggleSong(song.key, c)}
+
+                                label={song.name}
+                            />
+                        </>)) }
+                    </FilterCol2>
+                </FilterRow>
             </div>
         : ''}
     </>)
@@ -50,6 +148,14 @@ const FilterCheckbox: FunctionComponent<{ label: string, checked: boolean, setCh
     
 </div>
 
-const FilterRow: FunctionComponent<{}> = ({children}) => <div className='flex'>{children}</div>
-const FilterCol1: FunctionComponent<{}> = ({children}) => <div className="flex-col w-1/5">{children}</div>
-const FilterCol2: FunctionComponent<{}> = ({children}) => <div className="flex-col w-4/5">{children}</div>
+const FilterRow: FunctionComponent<{}> = ({children}) => <div className='flex justify-around'>{children}</div>
+const FilterCol1: FunctionComponent<{}> = ({children}) => <div className="flex-col w-36 flex-initial">{children}</div>
+const FilterCol2: FunctionComponent<{}> = ({children}) => <div className="flex-col flex-1">{children}</div>
+const FilterBox: FunctionComponent<{id: string, checked?: boolean, defaultChecked?: boolean, onCheck: (checked: boolean) => void, label?: string}> = ({id, checked, onCheck, label, defaultChecked}) => <div className={"inline-block select-none" + ((label) ? " mr-2" : "")}>
+    <input id={id} type="checkbox" 
+        checked={checked}
+        defaultChecked={defaultChecked}
+        onChange={(e) => onCheck(e.target.checked)}
+    />
+    {label ? <label htmlFor={id} className="select-none ml-1">{label}</label> : <></>}
+</div>
