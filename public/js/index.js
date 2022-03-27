@@ -124,6 +124,8 @@ Object.defineProperty(exports, "__esModule", ({
 
 var helpers_1 = __webpack_require__(/*! helpers */ "./app/helpers.ts");
 
+var locale_1 = __webpack_require__(/*! locale */ "./app/locale.ts");
+
 var react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 
 exports["default"] = function (_ref) {
@@ -135,6 +137,7 @@ exports["default"] = function (_ref) {
       open = _ref3[0],
       setOpen = _ref3[1];
 
+  var charaList = (0, locale_1.listCharacters)();
   return react_1["default"].createElement(react_1["default"].Fragment, null, react_1["default"].createElement("p", {
     className: "font-mono mt-4 text-left text-lg font-bold select-none hover:cursor-pointer",
     onClick: function onClick() {
@@ -144,13 +147,22 @@ exports["default"] = function (_ref) {
     className: 'filter-container'
   }, react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement("p", {
     className: "body-text"
-  }, "Test")), react_1["default"].createElement(FilterCol2, null, react_1["default"].createElement("p", {
-    className: "body-text"
-  }, "Test2"))), react_1["default"].createElement(FilterRow, null, react_1["default"].createElement(FilterCol1, null, react_1["default"].createElement("p", {
-    className: "body-text"
-  }, "Test")), react_1["default"].createElement(FilterCol2, null, react_1["default"].createElement("p", {
-    className: "body-text"
-  }, "Test2")))) : '');
+  }, "Character")), react_1["default"].createElement(FilterCol2, null, charaList.map(function (_char) {
+    return react_1["default"].createElement("div", {
+      className: "inline",
+      key: _char.key
+    }, react_1["default"].createElement("input", {
+      id: _char.key
+    }));
+  })))) : '');
+};
+
+var FilterCheckbox = function FilterCheckbox(props) {
+  return react_1["default"].createElement("div", null, react_1["default"].createElement("input", {
+    id: props.id
+  }), react_1["default"].createElement("span", {
+    className: ""
+  }));
 };
 
 var FilterRow = function FilterRow(_ref4) {
@@ -829,16 +841,80 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.listCharacters = exports.characterLocale = exports.listSongs = exports.listSeasons = exports.songLocale = void 0;
 exports.songLocale = {
-  'Intro': {
+  '0': {
     name: "Intro",
     season: "1"
   },
   '1': {
-    name: "Winter Wrap Up",
+    name: "Laughter Song",
     season: "1"
   },
   '2': {
+    name: "Pinkie's Gala Fantasy Song",
+    season: "1"
+  },
+  '3': {
+    name: "The Ticket Song",
+    season: "1"
+  },
+  "4": {
+    name: "Hop Skip and Jump",
+    season: "1"
+  },
+  "5": {
+    name: "Evil Enchantress",
+    season: "1"
+  },
+  "6": {
+    name: "Evil Enchantress Reprise",
+    season: "1"
+  },
+  "7": {
+    name: "Winter Wrap Up",
+    season: "1"
+  },
+  "8": {
+    name: "Cupcakes Song",
+    season: "1"
+  },
+  "9": {
+    name: "Art of the Dress",
+    season: "1"
+  },
+  "10": {
+    name: "Art of the Dress Reprise",
+    season: "1"
+  },
+  "11": {
+    name: "Hush Now Lullaby",
+    season: "1"
+  },
+  "12": {
+    name: "Cutie Mark Crusaders Song",
+    season: "1"
+  },
+  "13": {
+    name: "You Got to Share, You Got to Care",
+    season: "1"
+  },
+  "14": {
+    name: "So Many Wonders",
+    season: "1"
+  },
+  "15": {
+    name: "Pinkie Pie's Singing Telegram",
+    season: "1"
+  },
+  "16": {
     name: "At The Gala",
+    season: "1"
+  },
+  "17": {
+    name: "I'm at the Grand Galloping Gala",
+    season: "1"
+  },
+  "18": {
+    name: "Poney Pokey",
     season: "1"
   }
 };
@@ -867,7 +943,8 @@ exports.characterLocale = {
   fs: "Fluttershy",
   pp: "Pinkie",
   ra: "Rarity",
-  rd: "Rainbow"
+  rd: "Rainbow",
+  m6: "Mane 6"
 };
 
 var listCharacters = function listCharacters() {
@@ -1025,7 +1102,7 @@ exports["default"] = function (props) {
 
 
   function transformChop(chop_id) {
-    var _a;
+    var _a, _b;
 
     var song = chop_id.song;
     var chop_filename = chop_id.chop_filename;
@@ -1036,7 +1113,7 @@ exports["default"] = function (props) {
       chop_filename: chop_filename,
       character: args[0],
       slug: (_a = args[1]) !== null && _a !== void 0 ? _a : '',
-      season: locale_1.songLocale[song].season
+      season: (_b = locale_1.songLocale[song]) === null || _b === void 0 ? void 0 : _b.season
     };
     return transformed;
   }
@@ -1058,9 +1135,9 @@ exports["default"] = function (props) {
   }
 
   var _ref12 = (0, react_1.useState)({
-    characters: (0, locale_1.listCharacters)().map(function (c) {
-      return c.key;
-    }),
+    // characters: listCharacters().map(c => c.key),
+    characters: ['fs', 'aj', 'm6', 'pp', 'ra', 'rd', 'ts'],
+    // characters: [ 'ra' ],
     seasons: (0, locale_1.listSeasons)(),
     songs: (0, locale_1.listSongs)().map(function (ep) {
       return ep.key;
@@ -1077,11 +1154,8 @@ exports["default"] = function (props) {
   function getFilteredTransformedChops(data) {
     return transformChops(data).filter(function (chop) {
       return filterOpts.characters.includes(chop.character);
-    }).filter(function (chop) {
-      return filterOpts.songs.includes(chop.song);
-    }).filter(function (chop) {
-      return filterOpts.seasons.includes(chop.season);
-    });
+    }); // .filter(chop => filterOpts.songs.includes(chop.song))
+    // .filter(chop => filterOpts.seasons.includes(chop.season))
   } // useEffect(() => {
   //     if(chopsData) {
   //         updateFilterOpts({characters: ['ra']})
@@ -1105,7 +1179,7 @@ exports["default"] = function (props) {
     return hotkeys_1.unregisterHotkeys;
   }, [ws, chopsData]); // register global hotkeys
 
-  var _ref14 = (0, helpers_1.useLocalStorage)('globalMode', true),
+  var _ref14 = (0, helpers_1.useLocalStorage)('globalMode', config_1["default"].desktop ? true : false),
       _ref15 = _slicedToArray(_ref14, 2),
       globalMode = _ref15[0],
       setGlobalMode = _ref15[1];

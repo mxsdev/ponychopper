@@ -92,7 +92,7 @@ export default ((props) => {
             song: song, chop_filename,
             character: args[0] as Character,
             slug: args[1] ?? '',
-            season: songLocale[song].season as Season
+            season: songLocale[song]?.season as Season
         }
 
         return transformed
@@ -108,8 +108,10 @@ export default ((props) => {
     }
 
     const [filterOpts, setFilterOpts] = useState<FilterOpts>({
-        characters: listCharacters().map(c => c.key),
-        seasons: listSeasons(),
+        // characters: listCharacters().map(c => c.key),
+        characters: [ 'fs', 'aj', 'm6', 'pp', 'ra', 'rd', 'ts' ],
+        // characters: [ 'ra' ],
+	    seasons: listSeasons(),
         songs: listSongs().map(ep => ep.key)
     })
 
@@ -117,9 +119,9 @@ export default ((props) => {
 
     function getFilteredTransformedChops(data: ChopsData) {
         return transformChops(data)
-            .filter(chop => filterOpts.characters.includes(chop.character))
-            .filter(chop => filterOpts.songs.includes(chop.song))
-            .filter(chop => filterOpts.seasons.includes(chop.season))
+             .filter(chop => filterOpts.characters.includes(chop.character))
+            // .filter(chop => filterOpts.songs.includes(chop.song))
+            // .filter(chop => filterOpts.seasons.includes(chop.season))
     }
 
     // useEffect(() => {
@@ -146,7 +148,7 @@ export default ((props) => {
     }, [ws, chopsData])
 
     // register global hotkeys
-    const [ globalMode, setGlobalMode ] = useLocalStorage<boolean>('globalMode', true)
+    const [ globalMode, setGlobalMode ] = useLocalStorage<boolean>('globalMode', config.desktop ? true : false)
 
     useEffect(() => {
         if(config.desktop) {
