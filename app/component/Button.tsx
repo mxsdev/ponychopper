@@ -1,10 +1,10 @@
-import React, { FunctionComponent } from "react"
+import React, { FunctionComponent, PropsWithChildren } from "react"
 
 interface OwnProps {
     onClick?: () => void
 }
 
-type Props = OwnProps
+type Props = PropsWithChildren<OwnProps>
 
 export default ((props) => {
     return (<>

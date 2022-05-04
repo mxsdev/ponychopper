@@ -1,6 +1,5 @@
 import { ipcRenderer } from "electron"
 import { ELECTRON_CONFIG } from "electron/config"
-import { chop, nextChop, prevChop, reloadChops } from "./chop"
 import { defaultChopDirectory } from "./directory"
 
 export default {
@@ -11,7 +10,6 @@ export default {
         )
     },
 
-    reloadChops,
     // chop, prevChop, nextChop,
 
     defaultChopDirectory

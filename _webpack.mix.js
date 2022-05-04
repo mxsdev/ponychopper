@@ -4,6 +4,7 @@ const fs = require('fs')
 const util = require('util')
 const { DefinePlugin } = require('webpack')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 const DIR_DIST = path.join(__dirname, 'dist')
 const DIR_APP  = path.join(__dirname, 'app')

@@ -1,3 +1,4 @@
+import './css/main.css'
 import Main from './main'
 import ReactDOM from 'react-dom'
 import React from 'react'

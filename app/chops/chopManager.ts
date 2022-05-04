@@ -7,13 +7,17 @@ import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelect
 import path from 'path'
 import fs from 'fs/promises'
 
-export async function createChopFileManager(fileDir: PathLike) {
-    const manager = new ChopFileManager()
-
-    await manager.loadFiles(fileDir)
-
-    return manager
+export async function test() {
+    return 'sdfsdf'
 }
+
+// export async function createChopFileManager(fileDir: PathLike) {
+//     const manager = new ChopFileManager()
+
+//     await manager.loadFiles(fileDir)
+
+//     return manager
+// }
 
 export class ChopFileManager {
     private files: ChopFile[] = [ ]
@@ -71,7 +75,8 @@ export class ChopFileManager {
 
         if(curr.buffer) return curr.buffer
 
-        const buff = await selectionToBuffer(curr.pos, curr_file)
+        // const buff = await selectionToBuffer(curr.pos, curr_file)
+        const buff = Buffer.alloc(5)
 
         curr.buffer = buff
 

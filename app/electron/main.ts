@@ -1,8 +1,7 @@
 import { app, BrowserWindow, ipcMain, contextBridge, globalShortcut, ipcRenderer } from 'electron'
 import path from 'path'
-import os from 'os'
-import fs from 'fs'
 import { ELECTRON_CONFIG } from './config'
+import { test } from 'chops/chopManager'
 
 // create window
 let win: BrowserWindow|null = null
@@ -25,6 +24,8 @@ function createWindow() {
 
 app.whenReady().then(() => {
     createWindow()
+
+    console.log(test)
 
     // const audio_dir = path.join(__dirname, '../../../ponychopper-audio/')
     // await manager.loadFiles(audio_dir)

@@ -1,7 +1,7 @@
 import { useLocalStorage } from "helpers"
 import { Character, listCharacters, listSeasons, listSongs, Season, Song } from "locale"
 import { FilterOpts } from "main"
-import React, { FunctionComponent } from "react"
+import React, { FunctionComponent, PropsWithChildren } from "react"
 
 interface OwnProps {
     filterOpts: FilterOpts,
@@ -148,9 +148,9 @@ const FilterCheckbox: FunctionComponent<{ label: string, checked: boolean, setCh
     
 </div>
 
-const FilterRow: FunctionComponent<{}> = ({children}) => <div className='flex justify-around'>{children}</div>
-const FilterCol1: FunctionComponent<{}> = ({children}) => <div className="flex-col w-36 flex-initial">{children}</div>
-const FilterCol2: FunctionComponent<{}> = ({children}) => <div className="flex-col flex-1">{children}</div>
+const FilterRow: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className='flex justify-around'>{children}</div>
+const FilterCol1: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className="flex-col w-36 flex-initial">{children}</div>
+const FilterCol2: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className="flex-col flex-1">{children}</div>
 const FilterBox: FunctionComponent<{id: string, checked?: boolean, defaultChecked?: boolean, onCheck: (checked: boolean) => void, label?: string}> = ({id, checked, onCheck, label, defaultChecked}) => <div className={"inline-block select-none" + ((label) ? " mr-2" : "")}>
     <input id={id} type="checkbox" 
         checked={checked}
