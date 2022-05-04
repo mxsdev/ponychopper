@@ -1,5 +1,7 @@
 {
-    "/public/js/index.js": "/public/js/index.js",
-    "/desktop.js": "/desktop.js",
-    "/public/css/main.css": "/public/css/main.css"
+    "/ui/js/bundle.js": "/ui/js/bundle.js",
+    "/script/preload.js": "/script/preload.js",
+    "/main.js": "/main.js",
+    "/ui/css/main.css": "/ui/css/main.css",
+    "/dist/horse.png": "/dist/horse.png"
 }

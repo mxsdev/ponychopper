@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from "react"
-import config from 'config'
 import WaveSurfer from 'wavesurfer.js'
 import Button from 'component/Button'
 import WaveForm from 'component/WaveForm'
@@ -9,6 +8,7 @@ import { registerGlobalHotkeys, registerHotkeys, unregisterGlobalHotkeys, unregi
 import { Character, Song, Season, listCharacters, listSongs, listSeasons, songLocale } from "locale"
 import { useLocalStorage } from "helpers"
 import controls from "controls"
+import { isDesktop } from "util/desktop"
 
 interface OwnProps {
     
@@ -47,12 +47,22 @@ export default ((props) => {
     const [chopsDataLoading, setChopsDataLoading] = useState<boolean>(!!chopsData)
 
     useEffect(() => {
-        if(config.desktop) {
+        if(isDesktop()) {
             // @ts-ignore
-            window.electron.getChopsData()
-                .then((data: ChopsData) => setChopsData(data))
-                .finally(() => setChopsDataLoading(false))
+            // window.electron.getChopsData()
+            //     .then((data: ChopsData) => setChopsData(data))
+            //     .finally(() => setChopsDataLoading(false))
+            // TODO: initialize chops data
+
         }
+
+        // console.log('got here 1')
+        // console.log(api.test())
+
+        api.defaultChopDirectory()
+            .then(v => console.log(v))
+
+        // console.log(api.wtf())
     }, [])
 
     // load chop
@@ -64,13 +74,14 @@ export default ((props) => {
         
         setChopLoading(true)
 
-        if(config.desktop) {
+        if(isDesktop()) {
             // @ts-ignore
-            window.electron.getChopDataBlob(chop_id)
-                .then((blob: Blob) => {
-                    ws.loadBlob(blob)
-                    setCurrChopID(chop_id)
-                })
+            // window.electron.getChopDataBlob(chop_id)
+            //     .then((blob: Blob) => {
+            //         ws.loadBlob(blob)
+            //         setCurrChopID(chop_id)
+            //     })
+            // TODO: load chop
                 // .finally(() => setChopLoading(false))
         } else {
             // TODO: web loading
@@ -152,22 +163,29 @@ export default ((props) => {
     }, [ws, chopsData, filterOpts])
 
     // register global hotkeys
-    const [ globalMode, setGlobalMode ] = useLocalStorage<boolean>('globalMode', config.desktop ? true : false)
+    const [ globalMode, setGlobalMode ] = useLocalStorage<boolean>('globalMode', isDesktop() ? true : false)
+
+    // useEffect(() => {
+    //     if(isDesktop()) {
+    //         if(globalMode) {
+    //             registerGlobalHotkeys({ws, chop})
+    //         } else {
+    //             unregisterGlobalHotkeys()
+    //         }
+        
+    //         return unregisterGlobalHotkeys
+    //     }
+    // }, [ws, chopsData, globalMode])
+
+    // pin
+    const [ pinned, setPinned ] = useLocalStorage<boolean>('pinned', false)
 
     useEffect(() => {
-        if(config.desktop) {
-            if(globalMode) {
-                registerGlobalHotkeys({ws, chop})
-            } else {
-                unregisterGlobalHotkeys()
-            }
-        
-            return unregisterGlobalHotkeys
-        }
-    }, [ws, chopsData, globalMode])
+        api.setPinned(pinned)
+    }, [pinned])
 
     return (<>
-        <DesktopMenuItems globalMode={globalMode} setGlobalMode={setGlobalMode} />
+        <DesktopMenuItems globalMode={globalMode} setGlobalMode={setGlobalMode} pinned={pinned} setPinned={setPinned} />
 
         <div className="w-full max-w-[500px] mx-auto p-4 md:mt-32 mt-16">
             <p className="text-center text-5xl select-none">🔪.🐴</p>
@@ -189,7 +207,7 @@ export default ((props) => {
             
             {globalMode ? <p className="mt-4 text-center body-text text-sm">🌎: {controls(true)}</p> : ''}
 
-            {!config.desktop ? <p className="mt-8 text-center body-text text-sm">Note: The <a href="http://github.com">desktop version</a> allows you to drag the audio file directly into your DAW + other nice features</p> : ''}
+            {!isDesktop() ? <p className="mt-8 text-center body-text text-sm">Note: The <a href="http://github.com">desktop version</a> allows you to drag the audio file directly into your DAW + other nice features</p> : ''}
 
             <Filter filterOpts={filterOpts} updateFilterOpts={updateFilterOpts} />
 

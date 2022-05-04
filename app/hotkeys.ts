@@ -1,4 +1,4 @@
-import config from "config"
+import { isDesktop } from "util/desktop"
 
 type Listener = (event: Event) => void
 
@@ -61,14 +61,16 @@ export const unregisterHotkeys = () => {
 }
 
 export const registerGlobalHotkeys = ({ ws, chop }: { ws: WaveSurfer|null, chop: () => void }) => {
-    if(!config.desktop) return
+    if(!isDesktop()) return
     // @ts-ignore
-    window.electron.registerGlobalHotkeys()
+    // window.electron.registerGlobalHotkeys()
+    // TODO: register global hotkeys
 }
 
 export const unregisterGlobalHotkeys = () => {
-    if(!config.desktop) return
+    if(!isDesktop()) return
 
     // @ts-ignore
-    window.electron.unregisterGlobalHotkeys()
+    // window.electron.unregisterGlobalHotkeys()
+    // TODO: unregister global hotkeys
 }

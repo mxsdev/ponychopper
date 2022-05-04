@@ -1,0 +1,2 @@
+export const randomInteger = (min: number, max?: number) => max == null ? Math.floor(Math.random() * min) : Math.floor(Math.random() * (max - min) + min)
+export const arrayRandom = <T>(array: T[]) => array[randomInteger(0, array.length)]

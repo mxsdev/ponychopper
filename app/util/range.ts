@@ -1,0 +1,1 @@
+export const range = (start: number, end?: number) => end == null ? Array(start).fill(undefined).map((_, i) => i) : Array(end - start).fill(undefined).map((_, i) => i + start)

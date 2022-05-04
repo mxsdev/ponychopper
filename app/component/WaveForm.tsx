@@ -2,8 +2,8 @@ import React, { FunctionComponent, useCallback, useContext, useEffect, useState 
 import WaveSurfer from "wavesurfer.js"
 import {app_colors} from "app_colors.js"
 import Loader from "component/Loader"
-import config from "config"
 import { ChopID } from "main"
+import { isDesktop } from "util/desktop"
 
 interface OwnProps {
     ws: WaveSurfer|null,
@@ -62,9 +62,10 @@ export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
 
-        if(config.desktop && !showChopLoading && currChopID) {
+        if(isDesktop() && !showChopLoading && currChopID) {
             // @ts-ignore
-            window.electron.startDrag(currChopID)
+            // window.electron.startDrag(currChopID)
+            // TODO: start drag
         }
     }
 

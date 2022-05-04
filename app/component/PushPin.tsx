@@ -1,28 +1,30 @@
 import React, { FunctionComponent, useEffect } from "react"
 import { useLocalStorage } from "helpers"
-import config from "config"
+import { isDesktop } from "util/desktop"
 
 // import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 // import PushPinIcon from '@mui/icons-material/PushPin';
 
 interface OwnProps {
-    
+    pinned: boolean,
+    setPinned: (pinned: boolean) => void
 }
 
 type Props = OwnProps
 
-export default ((props) => {
-    const [ pinned, setPinned ] = useLocalStorage<boolean>('pinned', true)
+export default (({pinned, setPinned}) => {
+    // const [ pinned, setPinned ] = useLocalStorage<boolean>('pinned', true)
 
-    if(!config.desktop) return <></>
+    // if(!isDesktop()) return <></>
 
-    useEffect(() => {
-        // @ts-ignore
-        if(!window.electron) return
+    // useEffect(() => {
+    //     // @ts-ignore
+    //     if(!window.electron) return
 
-        // @ts-ignore
-        window.electron.setPinned(pinned)
-    }, [pinned])
+    //     // @ts-ignore
+    //     // window.electron.setPinned(pinned)
+    //     // TODO: set pinned
+    // }, [pinned])
 
     return (<>
         <Icon pinned={pinned} onClick={() => setPinned(!pinned)} />
