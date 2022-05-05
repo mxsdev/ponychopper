@@ -1,32 +1,34 @@
 import { app, BrowserWindow, ipcMain, contextBridge, globalShortcut, ipcRenderer } from 'electron'
 import path from 'path'
 import { ELECTRON_CONFIG } from './config'
-import { test } from 'chops/chopManager'
+import { ChopFileManager } from 'chops/chopManager'
 
 // create window
 let win: BrowserWindow|null = null
 
 function createWindow() {
     win = new BrowserWindow({
-        width: 450,
-        height: 800,
+        width: ELECTRON_CONFIG.window.width + (DEV_MODE ? 300 : 0),
+        height: ELECTRON_CONFIG.window.height,
         webPreferences: {
             preload: path.join(__dirname, DIST_PRELOAD)
         }
     })
 
-    win.loadFile(path.join(__dirname, DIST_INDEX_HTML))
-
     win.setMenuBarVisibility(false)
 
-    win.webContents.openDevTools()
+    if(DEV_MODE) {
+        win.loadURL(path.join('http://localhost:8080', DIST_INDEX_HTML))
+        win.webContents.openDevTools()
+    } else {
+        win.loadFile(path.join(__dirname, DIST_INDEX_HTML))
+    }
+    
 }
 
 app.whenReady().then(() => {
     createWindow()
-
-    console.log(test)
-
+    
     // const audio_dir = path.join(__dirname, '../../../ponychopper-audio/')
     // await manager.loadFiles(audio_dir)
 })

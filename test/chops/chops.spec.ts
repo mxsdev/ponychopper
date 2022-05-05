@@ -56,7 +56,7 @@ describe('chops.ts', () => {
     // describe('waveMetaToChopFile', () => {
     //     it('test', async () => {
     //         const audio_dir = path.join(__dirname, '../../../ponychopper-audio/')
-
+    // '/Users/maxstoumen/Projects/ponychopper-audio'
     //         const manager = await createChopFileManager(audio_dir)
 
     //         manager.chop()

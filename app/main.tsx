@@ -47,22 +47,23 @@ export default ((props) => {
     const [chopsDataLoading, setChopsDataLoading] = useState<boolean>(!!chopsData)
 
     useEffect(() => {
-        if(isDesktop()) {
-            // @ts-ignore
-            // window.electron.getChopsData()
-            //     .then((data: ChopsData) => setChopsData(data))
-            //     .finally(() => setChopsDataLoading(false))
-            // TODO: initialize chops data
+        // api.reloadChops('/Users/maxstoumen/Projects/ponychopper-audio')
+        //     .then((numFound) => {
+        //         console.log(`Found ${numFound} chop files!`)
+        //     })
+        //     .then(() => {
+        //         const sel = api.chop()
 
-        }
+        //         console.log(sel)
 
-        // console.log('got here 1')
-        // console.log(api.test())
+        //         return api.loadBuffer()
+        //     })
+        //     .then((buff) => {
+        //         console.log(`Buffer length: ${buff.length}`)
+        //     })
 
         api.defaultChopDirectory()
-            .then(v => console.log(v))
-
-        // console.log(api.wtf())
+            .then(v => console.log(`Default chop directory: ${v}`))
     }, [])
 
     // load chop

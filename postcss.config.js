@@ -1,10 +1,12 @@
 const tailwindcss = require('tailwindcss');
-const nested = require("postcss-nested")
+const autoprefixer = require('autoprefixer')
+// const nested = require("postcss-nested")
 
 module.exports = {
-  plugins: [
-    'postcss-preset-env',
-    nested,
-    tailwindcss
-  ],
+  plugins: {
+    'postcss-preset-env': {},
+    'tailwindcss/nesting': 'postcss-nested',
+    tailwindcss: {},
+    autoprefixer: {}
+  },
 };

@@ -1,11 +1,9 @@
 import './css/main.css'
 import Main from './main'
-import ReactDOM from 'react-dom'
-import React from 'react'
+import React, { ReactNode } from 'react'
+import { createRoot } from 'react-dom/client';
 
-ReactDOM.render(
-    <React.StrictMode>
-        <Main />
-    </React.StrictMode>,
-    document.getElementById('root')
-)
+const container = document.getElementById('root')
+const root = createRoot(container!)
+
+root.render(<Main />)

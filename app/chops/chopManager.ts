@@ -7,17 +7,13 @@ import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelect
 import path from 'path'
 import fs from 'fs/promises'
 
-export async function test() {
-    return 'sdfsdf'
+export async function createChopFileManager(fileDir: PathLike) {
+    const manager = new ChopFileManager()
+
+    await manager.loadFiles(fileDir)
+
+    return manager
 }
-
-// export async function createChopFileManager(fileDir: PathLike) {
-//     const manager = new ChopFileManager()
-
-//     await manager.loadFiles(fileDir)
-
-//     return manager
-// }
 
 export class ChopFileManager {
     private files: ChopFile[] = [ ]
@@ -67,16 +63,15 @@ export class ChopFileManager {
         return this.files[curr.fileIndex]?.location
     }
 
-    async buffer(): Promise<Buffer|undefined> {
+    async buffer(): Promise<Buffer> {
         const curr = this.current()
         const curr_file = this.currentFile()
 
-        if(!curr || !curr_file) return undefined
+        if(!curr || !curr_file) throw new Error('Cannot get buffer without selection')
 
         if(curr.buffer) return curr.buffer
 
-        // const buff = await selectionToBuffer(curr.pos, curr_file)
-        const buff = Buffer.alloc(5)
+        const buff = await selectionToBuffer(curr.pos, curr_file)
 
         curr.buffer = buff
 

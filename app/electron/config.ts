@@ -11,5 +11,6 @@ export const ELECTRON_CONFIG = {
     },
     ipc_functions: {
         get_user_data: 'getuserdata'
-    }
+    },
+    // dev_mode: process.env.NODE_ENV === 'development'
 }

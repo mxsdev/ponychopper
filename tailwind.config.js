@@ -1,5 +1,5 @@
 module.exports = {
-  purge: [
+  content: [
     './app/**/*.html',
     './app/**/*.tsx',
     './app/**/*.ts',
@@ -7,7 +7,6 @@ module.exports = {
     './app/**/*.js',
   ],
   mode: 'jit',
-  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
       spacing: {
