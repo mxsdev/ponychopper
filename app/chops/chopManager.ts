@@ -118,6 +118,8 @@ export class ChopFileManager {
     }
 
     prev() {
+        console.log('got here ksjnfksjdf')
+
         this.selection.prev()
         return this.current()
     }

@@ -42,8 +42,8 @@ export default ((props) => {
                     chopLoading={chopLoading}
                     
                     onChop={chop}
-                    onNext={prev}
-                    onPrev={next}
+                    onNext={next}
+                    onPrev={prev}
                 />
             </div>
         </MainContainer>
