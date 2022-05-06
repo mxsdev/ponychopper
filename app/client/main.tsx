@@ -8,7 +8,7 @@ import { compareSelections } from "util/selection"
 import { MainContainer } from "./component/MainContainer"
 import { Header } from "./component/Header"
 import { WaveSection } from "./component/wave/WaveSection"
-import { useSettings } from "./settings"
+import { useSettings } from "./util/localSettings"
 import { useWaveSurfer } from "./util/audio"
 import { useChops } from "./util/chop"
 
@@ -19,7 +19,7 @@ type Props = { }
 export default ((props) => {
     const { setWS, chopLoading, controls, isPlaying, startDrag } = useWaveSurfer()
 
-    const settings = useSettings()
+    const { settingsOpened, toggleSettings, ...settings} = useSettings()
 
     const { chop, prev, next, loading: filesLoading } = useChops()
 
@@ -49,6 +49,10 @@ export default ((props) => {
                     onDragStart={() => startDrag()}
                 />
             </div>
+
+            <Button onClick={() => toggleSettings()}>
+                {settingsOpened ? 'close settings' : 'open settings'}
+            </Button>
         </MainContainer>
     </>)
 }) as FunctionComponent<Props>

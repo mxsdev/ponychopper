@@ -1,7 +1,5 @@
-import { Paid } from "@mui/icons-material"
-import { ChopFileStatus } from "chops/chopManager"
 import { ChopFileSummary, FilterOpts } from "chops/chops"
-import { ELECTRON_CONFIG } from "electron/config"
+import { AddEventListener, PCEventListener, RemoveEventListener } from "client/event/events"
 import { useEffect, useState } from "react"
 
 export const useChops = () => {
@@ -18,32 +16,23 @@ export const useChops = () => {
     }
 
     useEffect(() => {
-        const EVT_FILESTATUS = ELECTRON_CONFIG.window_events.chop.filesStatus
-
-        const fileStatusListener = (({ detail: { status } }: CustomEvent<{ status: ChopFileStatus }>) => {
+        const fileStatusListener: PCEventListener<'chop_file_status'> = ({ detail: { status } }) => {
             setLoading(status.loading)
 
             if(status.summary) {
-                console.log(status.summary)
                 setChopSummary(status.summary)
             }
-        }) as EventListener
+        }
 
-        window.addEventListener(
-            EVT_FILESTATUS, 
-            fileStatusListener
-        )
+        AddEventListener('chop_file_status', fileStatusListener)
 
         return () => {
-            window.removeEventListener(
-                EVT_FILESTATUS,
-                fileStatusListener
-            )
+            RemoveEventListener('chop_file_status', fileStatusListener)
         }
     }, [])
 
     useEffect(() => {
-        api.signalReady()
+        api.signalReady('main')
     }, [])
 
     useEffect(() => {

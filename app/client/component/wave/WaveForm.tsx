@@ -49,8 +49,6 @@ export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading, onDragS
         event.preventDefault()
 
         if(!showChopLoading && !chopLoading) {
-            console.log(_onDragStart)
-
             _onDragStart?.()
         }
     }

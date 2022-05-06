@@ -11,19 +11,6 @@ type Props = {
 }
 
 export const PushPin: FunctionComponent<Props> = ({pinned, setPinned}) => {
-    // const [ pinned, setPinned ] = useLocalStorage<boolean>('pinned', true)
-
-    // if(!isDesktop()) return <></>
-
-    // useEffect(() => {
-    //     // @ts-ignore
-    //     if(!window.electron) return
-
-    //     // @ts-ignore
-    //     // window.electron.setPinned(pinned)
-    //     // TODO: set pinned
-    // }, [pinned])
-
     return (<>
         <Icon pinned={pinned} onClick={() => setPinned(!pinned)} />
     </>)

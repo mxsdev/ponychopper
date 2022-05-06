@@ -6,13 +6,10 @@ import { ensure_exists } from 'util/file'
 import { genDefaultChopDir, genDefaultSrcDir } from './folders'
 import { registerChopManager } from './main/manager'
 import { WindowManager } from './main/windows'
-
-const DEFAULT_USER_DATA_DIR = path.resolve(app.getPath('userData'), 'ponychopper')
-
-ensure_exists(genDefaultChopDir(DEFAULT_USER_DATA_DIR))
-ensure_exists(genDefaultSrcDir(DEFAULT_USER_DATA_DIR))
+import { IPCMainListen } from './ipc/ipcmain'
 
 const windowManager = new WindowManager()
+windowManager.registerIPCListeners()
 
 app.whenReady().then(() => {
     const mainWindow = windowManager.createMainWindow()
@@ -21,7 +18,7 @@ app.whenReady().then(() => {
 })
 
 // set pinned
-ipcMain.on(ELECTRON_CONFIG.ipc_events.set_pinned, (event, pinned: boolean) => {
+IPCMainListen('set_pinned', (event, pinned) => {
     BrowserWindow.getFocusedWindow()?.setAlwaysOnTop(pinned, 'pop-up-menu')
 })
 

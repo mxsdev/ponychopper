@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// TODO: replace this with something better
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
   // Pass initial state function to useState so logic is only executed once

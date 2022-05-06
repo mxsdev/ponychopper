@@ -151,8 +151,6 @@ export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]):
                 speech += running_speech
             }
 
-            // console.log(containingWord.speech ?? running_speech)
-
             i += j 
             numWords++
         } else {

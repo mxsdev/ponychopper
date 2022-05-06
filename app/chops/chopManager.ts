@@ -9,6 +9,7 @@ import fs from 'fs/promises'
 import EventEmitter from 'events'
 import TypedEmitter from "typed-emitter"
 import { HighlightSharp } from '@mui/icons-material'
+import { TypedEmitterInstance } from 'util/emitter'
 
 export async function createChopFileManager(fileDir: PathLike) {
     const manager = new ChopFileManager()
@@ -23,16 +24,18 @@ export type ChopFileStatus = {
     summary?: ChopFileSummary
 }
 
-type ChopFileManagerMessages = new () => TypedEmitter<{
+type ChopFileManagerMessages = {
     'select': (selection: ChopSelection|null) => void,
     'buffer': (buffer: Buffer) => void,
     'fileStatus': (status: ChopFileStatus) => void
-}>
+}
 
-export class ChopFileManager extends (EventEmitter as ChopFileManagerMessages) {
+export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopFileManagerMessages>) {
     private files: ChopFile[] = [ ]
 
     private selection = new SelectionHistory()
+
+    private status: ChopFileStatus = { loading: false }
 
     private selector: ChopSelector|null = null
     private filterOpts: FilterOpts = { }
@@ -48,10 +51,9 @@ export class ChopFileManager extends (EventEmitter as ChopFileManagerMessages) {
     }
 
     async loadFiles(fileDir: PathLike) {
-        // TODO: load files from directory
         this.files = [ ]
 
-        this.emit('fileStatus', { loading: true })
+        this.setFileStatus({ loading: true })
 
         const folder = fileDir.toString()
         const files = await getFilesRecursively(folder)
@@ -85,13 +87,18 @@ export class ChopFileManager extends (EventEmitter as ChopFileManagerMessages) {
 
         const summary = this.fileSummary()
 
-        this.emit('fileStatus', { loading: false, summary })
+        this.setFileStatus({ loading: false, summary })
 
         return summary
     }
 
-    emitFileStatus() {
+    setFileStatus(status: ChopFileStatus) {
+        this.status = status
+        this.emit('fileStatus', status)
+    }
 
+    getFileStatus() {
+        return this.status
     }
 
     fileSummary() {

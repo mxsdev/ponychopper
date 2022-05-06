@@ -1,21 +1,25 @@
 import { ChopFileManager } from "chops/chopManager";
-import type { BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { ELECTRON_CONFIG } from "electron/config";
 import { WindowManager } from "./windows";
 import fs from 'fs'
 import path from 'path'
+import { IPCMainListen, IPCMainSend } from "electron/ipc/ipcmain";
+import { UserSettings } from "./settings";
 
 export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager) {
     const manager = new ChopFileManager()
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.chop.filter, (event, filter: FilterOpts|undefined) => {
+    const srcDir = UserSettings.get<string, string>('srcDir')
+    
+    manager.loadFiles(srcDir)
+
+    IPCMainListen('filter', (event, filter) => {
         if(!filter) return
         manager.filter(filter)
     })
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.drag_start, (event) => {
-        console.log('got here xdxd')
-
+    IPCMainListen('drag_start', (event) => {
         if(!manager.current()) return
 
         manager.buffer()
@@ -34,34 +38,33 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager)
             })
     })
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.chop.chop, (event) => {
+    IPCMainListen('chop', (event) => {
         manager.chop()
     })
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.chop.next, (event) => {
+    IPCMainListen('next', (event) => {
         manager.next()
     })
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.chop.prev, (event) => {
+    IPCMainListen('prev', (event) => {
         manager.prev()
     })
 
-    ipc.on(ELECTRON_CONFIG.ipc_events.chop.ready, (event) => {
-        // TODO: make this better...
-        manager.loadFiles('/Users/maxstoumen/Projects/ponychopper-audio')
+    IPCMainListen('ready', (event, from) => {
+        if(from === 'main') {
+            IPCMainSend(event.sender, 'filesStatus', manager.getFileStatus())
+        }
     })
 
     manager.on('buffer', (buff) => {
-        windows.getMainWindow()?.webContents.send(ELECTRON_CONFIG.web_events.chop.buffer, buff)
+        IPCMainSend(windows.getMainWindow()?.webContents, 'buffer', buff)
     })
 
     manager.on('select', (selection) => {
-        windows.getMainWindow()?.webContents.send(ELECTRON_CONFIG.web_events.chop.selection, selection)
+        IPCMainSend(windows.getMainWindow()?.webContents, 'selection', selection)
     })
 
     manager.on('fileStatus', (status) => {
-        windows.getAllWindows().forEach(win => win.webContents.send(ELECTRON_CONFIG.web_events.chop.filesStatus, status))
+        windows.getAllWindows().forEach(win => IPCMainSend(win.webContents, 'filesStatus', status))
     })
-
-    // ipc.on(ELECTRON_CONFIG.ipc_events.chop.)
 }

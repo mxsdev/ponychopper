@@ -1,3 +1,4 @@
+import { AddEventListener, PCEventListener, RemoveEventListener } from "client/event/events"
 import { ELECTRON_CONFIG } from "electron/config"
 import { useEffect, useState } from "react"
 
@@ -9,22 +10,17 @@ export const useWaveSurfer = () => {
     const [ isPlaying, setIsPlaying ] = useState<boolean>(false)
 
     const startDrag = () => {
-        console.log('audio.ts: startDrag called')
-
         api.beginDrag()
     }
 
     useEffect(() => {
         if(!ws) return
 
-        const bufferListener = ((ev: CustomEvent<{ buff: Buffer }>) => {
+        const bufferListener: PCEventListener<'chop_buffer'> = (ev) => {
             ws?.loadBlob(new Blob([ev.detail.buff]))
-        }) as EventListener
+        }
 
-        window.addEventListener(
-            ELECTRON_CONFIG.window_events.chop.buffer,
-            bufferListener
-        )
+        AddEventListener('chop_buffer', bufferListener)
 
         const onEnd = () => setIsPlaying(false)
         const onStart = () => setIsPlaying(true)
@@ -34,10 +30,7 @@ export const useWaveSurfer = () => {
         ws.on('finish', onEnd)
 
         return () => {
-            window.removeEventListener(
-                ELECTRON_CONFIG.window_events.chop.buffer, 
-                bufferListener
-            )
+            RemoveEventListener('chop_buffer', bufferListener)
 
             ws.un('play', onStart)
             ws.un('pause', onEnd)
