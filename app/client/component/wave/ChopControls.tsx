@@ -6,14 +6,16 @@ type Props = {
     className?: string,
     onChop?: () => void,
     onPrev?: () => void,
-    onNext?: () => void
+    onNext?: () => void,
+
+    chopsEnabled: boolean
 }
 
 export const ChopControls: FunctionComponent<Props> = ({onChop, onPrev, onNext, ...props}) => {
     return (<>
         <div className={cl("flex flex-col gap-1", props.className)}>
             <div className="w-full pb-[100%] h-0 relative overflow-hidden">
-                <Button onClick={onChop} className="block w-full h-full absolute top-0 left-0">
+                <Button onClick={onChop} className="block w-full h-full absolute top-0 left-0" disabled={!props.chopsEnabled}>
                     <span className="text-4xl select-none">🔪</span>
                 </Button>
             </div>

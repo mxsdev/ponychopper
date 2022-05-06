@@ -21,14 +21,14 @@ export default ((props) => {
 
     const { settingsOpened, toggleSettings, ...settings} = useSettings()
 
-    const { chop, prev, next, loading: filesLoading } = useChops()
+    const { chop, prev, next, loading: filesLoading, chopsEnabled } = useChops()
 
     const loading = chopLoading || filesLoading
 
     return (<>
         <DesktopMenuItems 
-            globalMode={settings.globalMode} 
-            setGlobalMode={settings.setGlobalMode} 
+            settingsOpen={settingsOpened}
+            toggleSettings={toggleSettings}
 
             pinned={settings.pinned} 
             setPinned={settings.setPinned} 
@@ -47,12 +47,10 @@ export default ((props) => {
                     onPrev={prev}
 
                     onDragStart={() => startDrag()}
+
+                    chopsEnabled={!!chopsEnabled}
                 />
             </div>
-
-            <Button onClick={() => toggleSettings()}>
-                {settingsOpened ? 'close settings' : 'open settings'}
-            </Button>
         </MainContainer>
     </>)
 }) as FunctionComponent<Props>

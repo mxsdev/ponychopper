@@ -106,12 +106,14 @@ const serializePitch = (pitch: ChopPitch): string => `${pitch.class},${pitch.oct
 
 export type ChopFileSummary = {
     speakers: string[],
+    numChopFragments: number,
     numFiles: number
 }
 
 export function chopFileSummary(files: ChopFile[]): ChopFileSummary {
     return ({
         numFiles: files.length,
+        numChopFragments: files.reduce((prev, curr) => prev + curr.chops.length, 0),
         speakers: [...new Set<string>(files.flatMap(f => f.chops.flatMap(f => f.speakers ?? [])))]
     })
 }

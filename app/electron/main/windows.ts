@@ -7,7 +7,7 @@ import { IPCMainListen, IPCMainSend, IPCMainUnlisten } from 'electron/ipc/ipcmai
 
 export type WindowType = 'main'|'settings'
 
-function createWindow(opts: { width: number, height: number, mode: WindowType }): BrowserWindow {
+function createWindow(opts: { width: number, height: number, mode: WindowType, parent?: BrowserWindow, show?: boolean }): BrowserWindow {
     const DO_DEV_TOOLS = DEV_MODE && (opts.mode === 'main')
 
     const win = new BrowserWindow({
@@ -15,13 +15,15 @@ function createWindow(opts: { width: number, height: number, mode: WindowType })
         height: opts.height,
         webPreferences: {
             preload: path.join(__dirname, DIST_PRELOAD)
-        }
+        },
+        parent: opts.parent,
+        show: opts.show ?? true
     })
 
     win.setMenuBarVisibility(false)
 
     if(opts.mode === 'settings') {
-        win.setAlwaysOnTop(true, 'pop-up-menu')
+        // win.setAlwaysOnTop(true, 'pop-up-menu')
         win.setResizable(false)
     }
 
@@ -100,8 +102,13 @@ export class WindowManager extends (EventEmitter as TypedEmitterInstance<{
         const win = createWindow({
             width: ELECTRON_CONFIG.window.settings.width,
             height: ELECTRON_CONFIG.window.settings.height,
-            mode: 'settings'
+            mode: 'settings',
+            parent: this.getMainWindow() ?? undefined,
+            show: false
         })
+
+        win.showInactive()
+        win.setAlwaysOnTop(true, 'pop-up-menu')
 
         this.settingsWindow = win
         this.emit('window_status', { type: 'settings', opened: true })

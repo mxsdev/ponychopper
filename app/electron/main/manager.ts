@@ -22,6 +22,7 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager)
     IPCMainListen('drag_start', (event) => {
         if(!manager.current()) return
 
+        // TODO: move this code to manager class
         manager.buffer()
             .then(async (buff) => {
                 const fname = path.join('/Users/maxstoumen/Music/choptest', 'test.wav')

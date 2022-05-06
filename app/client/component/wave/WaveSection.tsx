@@ -7,7 +7,7 @@ type Props = ComponentProps<typeof WaveForm> & ComponentProps<typeof ChopControl
     className?: string
 }
 
-export const WaveSection: FunctionComponent<Props> = ({ className, setWS, chopLoading, onChop, onNext, onPrev, onDragStart }) => {
+export const WaveSection: FunctionComponent<Props> = ({ className, setWS, chopLoading, onChop, onNext, onPrev, onDragStart, chopsEnabled }) => {
     return (<>
         <div className={cl("flex items-center self-center justify-center", className)}>
             <div className="text-center overflow-hidden" draggable={true}>
@@ -16,6 +16,7 @@ export const WaveSection: FunctionComponent<Props> = ({ className, setWS, chopLo
 
             <div className="ml-10 w-16">
                 <ChopControls
+                    chopsEnabled={chopsEnabled}
                     onChop={onChop}
                     onNext={onNext}
                     onPrev={onPrev}

@@ -7,7 +7,7 @@ export const useChops = () => {
 
     const [ chopSummary, setChopSummary ] = useState<ChopFileSummary|null>(null)
 
-    const chopsEnabled = chopSummary && chopSummary.numFiles > 0
+    const chopsEnabled = chopSummary && chopSummary.numChopFragments > 0
 
     const [ filter, _setFilter ] = useState<FilterOpts>({ syllables: { lte: 3, gte: 1 } })
 
@@ -52,7 +52,15 @@ export const useChops = () => {
 
     })
 
-    const chop = () => api.chop()
+    const chop = () => {
+        if(!chopsEnabled) {
+            alert('No files found to chop!\n\nYou can change the source file directory in the settings.')
+            return
+        }
+
+        api.chop()
+    }
+
     const prev = () => api.prevChop()
     const next = () => api.nextChop()
 

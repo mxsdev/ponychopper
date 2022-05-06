@@ -26,7 +26,7 @@ export const useSettings = () => {
 
         return () => RemoveEventListener('settings_window_status', settingsListener)
     }, [])
-
+    
     return {
         globalMode, setGlobalMode,
         pinned, setPinned,
