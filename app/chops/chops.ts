@@ -1,3 +1,4 @@
+import { getContiguousSubarrays } from './../util/arrays';
 import { getWaveSampleRange, WaveMeta, WaveWriter } from "../util/riff"
 import fs from 'fs/promises'
 import type { PathLike } from 'fs'
@@ -72,6 +73,19 @@ export type ChopSelection = {
     speakers: string[],
     syllables: number,
 
+    word: {
+        numWords: number,
+        leftFull: boolean, rightFull: boolean,
+    },
+
+    phrase: {
+        numPhrases: number,
+        leftFull: boolean, rightFull: boolean
+    },
+
+    fragmentIndex: number,
+    fragmentLength: number,
+
     buffer?: Buffer
 }
 
@@ -90,42 +104,67 @@ export const regionUnion = (...regions: ChopPosRegion[]): ChopPosRegion => {
 
 const serializePitch = (pitch: ChopPitch): string => `${pitch.class},${pitch.octave}`
 
-export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]): string => {
+export type ChopFileSummary = {
+    speakers: string[],
+    numFiles: number
+}
+
+export function chopFileSummary(files: ChopFile[]): ChopFileSummary {
+    return ({
+        numFiles: files.length,
+        speakers: [...new Set<string>(files.flatMap(f => f.chops.flatMap(f => f.speakers ?? [])))]
+    })
+}
+
+export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]): { speech: string } & Pick<ChopSelection, 'word'> => {
     let i = 0
 
-    let str = ''
+    let speech = ''
+
+    let numWords = 0
+    let leftFull = false
+    let rightFull = false
 
     while(i < fragments.length) {
         const frag = fragments[i]
 
         const containingWord = words.find(word => regionContains(word.pos, frag.pos))
 
-        if(containingWord && containingWord.speech) {
-            let running_str = frag.speech
+        if(containingWord) {
+            let running_speech = frag.speech
             let j = 1
 
             while(fragments[j+i] && regionContains(containingWord.pos, fragments[j+i].pos)) {
-                running_str += fragments[j+i].speech
+                running_speech += fragments[j+i].speech
                 j++
             }
 
             if(j === containingWord.numFragments) {
-                str += containingWord.speech
+                speech += containingWord.speech ?? running_speech
+
+                if(i === 0) {
+                    leftFull = true
+                }else if(i + j === fragments.length) {
+                    rightFull = true
+                }
             } else {
-                str += running_str
+                speech += running_speech
             }
 
+            // console.log(containingWord.speech ?? running_speech)
+
             i += j 
+            numWords++
         } else {
-            str += frag.speech
+            speech += frag.speech
             i++
         }
     }
 
-    return str
+    return { speech, word: { leftFull, rightFull, numWords }}
 }
 
-export const fragmentsToSelection = (fileIndex: number, fragments: ChopFragment[], words: ChopWord[]): ChopSelection => {
+export const fragmentsToSelection = (fileIndex: number, fragments: ChopFragment[], words: ChopWord[], fragmentIndex: number, fragmentLength: number): ChopSelection => {
     // get pitch list without duplicates
     const pitches: ChopPitch[] = []
     const seenPitches: Record<string, boolean> = { }
@@ -138,14 +177,21 @@ export const fragmentsToSelection = (fileIndex: number, fragments: ChopFragment[
         seenPitches[sp] = true
     })
 
+    const { speech, word } = fragmentsToSpeech(fragments, words)
+
     return ({
         fileIndex,
         pos: regionUnion(...fragments.map(f => f.pos)),
-        speech: fragmentsToSpeech(fragments, words),
+        speech,
 
         pitches,
         speakers: [...new Set<string>( fragments.flatMap(f => f.speakers ?? []) )],
-        syllables: fragments.reduce((prev, curr) => prev + curr.syllables, 0)
+        syllables: fragments.reduce((prev, curr) => prev + curr.syllables, 0),
+
+        fragmentIndex, fragmentLength,
+
+        word,
+        phrase: { numPhrases: 0, leftFull: false, rightFull: false }
     })
 }
 
@@ -357,6 +403,18 @@ export function waveMetaToChopFile(wavMeta: WaveMeta, location: PathLike): ChopF
             speech: c.speech
         }))
 
+    words.push(
+        ...chops
+            .filter(c => !words.some(w => regionContains(w.pos, c.pos)))
+            .map(v => ({
+                pos: {
+                    start: v.pos.start,
+                    length: 0
+                },
+                numFragments: 1
+            }))
+    )
+
     const chopMeta: ChopFile['meta'] = rtype('meta')
         .reduce((prev, curr) => {
             return ({
@@ -376,4 +434,95 @@ export function waveMetaToChopFile(wavMeta: WaveMeta, location: PathLike): ChopF
     return {
         chops, gaps, location, meta: chopMeta, wavMeta, phrases, words
     }
+}
+
+const MAX_SELECTION_FRAGMENTS = 16
+
+function getAllChopSelections(file: ChopFile, fileIndex: number): ChopSelection[] {
+    const res: ChopSelection[] = [ ]
+
+    const chunks: ChopFragment[][] = [ ]
+
+    let i = 0
+    let j = 0
+
+    while( i < file.gaps.length && j < file.chops.length ) {
+        const chunk: ChopFragment[] = []
+
+        while(file.chops[j].pos.start <= file.gaps[i]) {
+            chunk.push(file.chops[j])
+
+            j++
+        }
+
+        if(chunk.length > 0) chunks.push(chunk)
+
+        i++
+    }
+
+    let k = 0
+
+    chunks.forEach(chunk => {
+        for (let x = 0; x < chunk.length; x++) {
+            for (let y = x; y < chunk.length; y++) {
+                if(y - x + 1 > MAX_SELECTION_FRAGMENTS) continue
+
+                res.push(
+                    fragmentsToSelection(
+                        fileIndex,
+                        chunk.slice(x, y+1),
+                        file.words,
+                        x+k, y+k
+                    )
+                )
+            }
+        }
+
+        k += chunk.length
+    })
+
+    // while( i < file.gaps.length ) {
+    //     const l: number = (i < 0 ? -Infinity : file.gaps[i])
+    //     const r: number = (i + 1 === file.gaps.length ? Infinity : file.gaps[i+1])
+
+    //     const fragments = file.chops.filter(c => c.pos.start >= l && c.pos.start <= r)
+
+    //     res.push(
+    //         ...getContiguousSubarrays(fragments)
+    //             .map(v => fragmentsToSelection(
+    //                 fileIndex, v, file.words, file.chops.indexOf(v[0]),
+    //                 file.chops.indexOf(v[v.length-1])
+    //             ))
+    //     )
+
+    //     i++
+    // }
+
+    return res
+}
+
+export type FilterOpts = {
+    syllables?: { 
+        gte?: number,
+        lte?: number
+    }
+}
+
+export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
+
+export function createChopSelector(files: ChopFile[]): ChopSelector {
+    const selections: ChopSelection[] = files.flatMap((file, i) => getAllChopSelections(file, i))
+
+    return ((opts) => {
+        return selections
+            .filter((sel) => {
+                const gte = opts.syllables?.gte
+                const lte = opts.syllables?.lte
+
+                if(gte != null && !(sel.syllables >= gte)) return false
+                if(lte != null && !(sel.syllables <= lte)) return false
+
+                return true
+            })
+    })
 }

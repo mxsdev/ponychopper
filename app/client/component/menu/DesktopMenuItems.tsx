@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react"
-import PushPin from "component/PushPin"
-import Global from "component/Global"
+import { PushPin } from "./PushPin"
+import { Global } from "./Global"
 import { isDesktop } from "util/desktop"
 
 interface OwnProps {

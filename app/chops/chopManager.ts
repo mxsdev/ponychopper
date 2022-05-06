@@ -3,7 +3,7 @@ import { getWaveMeta, WaveMeta } from '../util/riff'
 import { getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
-import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer } from './chops'
+import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopSelector, createChopSelector, FilterOpts, chopFileSummary } from './chops'
 import path from 'path'
 import fs from 'fs/promises'
 
@@ -15,10 +15,16 @@ export async function createChopFileManager(fileDir: PathLike) {
     return manager
 }
 
+export type ChopSelectionListener = SelectionListener<ChopSelection>
+
 export class ChopFileManager {
     private files: ChopFile[] = [ ]
 
     private selection = new SelectionHistory<ChopSelection>()
+
+    private selector: ChopSelector|null = null
+    private filterOpts: FilterOpts = { }
+    private selectionList: ChopSelection[] = [ ]
 
     constructor() { }
 
@@ -50,6 +56,26 @@ export class ChopFileManager {
             
             await handle.close()
         }))
+
+        this.empty()
+        this.selector = createChopSelector(this.files)
+
+        this.filter(this.filterOpts)
+
+        return this.fileSummary()
+    }
+
+    fileSummary() {
+        return chopFileSummary(this.files)
+    }
+
+    filter(opts: FilterOpts) {
+        this.filterOpts = opts
+
+        if(!this.selector) return 0
+        this.selectionList = this.selector(opts)
+
+        return this.selectionList.length
     }
 
     current(): ChopSelection|undefined {
@@ -78,34 +104,14 @@ export class ChopFileManager {
         return buff
     }
 
-    chop(maxSyllables: number = 8): ChopSelection {
-        // TODO: allow filter options as argument
+    numSelections() {
+        return this.selectionList.length
+    }
 
-        // for now: make a contiguous selection
-        // that does not include a gap
+    chop(): ChopSelection {
+        if(this.selectionList.length === 0) throw new Error('No chops available!')
 
-        if(this.files.length === 0) throw new Error('No chops loaded!')
-
-        const fileIndex = randomInteger(this.files.length)
-        const file = this.files[fileIndex]
-
-        const chopIndex = randomInteger(file.chops.length)
-        const chopFirst = file.chops[chopIndex]
-
-        const min = Math.min(...file.gaps.filter(gap => gap > chopFirst.pos.start))
-
-        let n = 1
-
-        while(chopIndex + n < file.chops.length && file.chops[chopIndex + n].pos.start < min) {
-            n++
-        }
-
-        const numChops = randomInteger(1, Math.min(n, maxSyllables)+1)
-
-        const fragments = file.chops.slice(chopIndex, chopIndex + numChops)
-
-        const sel = fragmentsToSelection(fileIndex, fragments, file.words)
-
+        const sel = arrayRandom(this.selectionList)
         this.selection.push(sel)
 
         return sel
@@ -124,11 +130,27 @@ export class ChopFileManager {
     numFiles() {
         return this.files.length
     }
+
+    empty() {
+        this.selection.empty()
+    }
+
+    addSelectionListener(listener: ChopSelectionListener) { 
+        this.selection.addSelectionListener(listener) 
+    }
+
+    removeSelectionListener(listener: ChopSelectionListener) {
+        this.selection.removeSelectionListener(listener)
+    }
 }
+
+type SelectionListener<T> = (val: T|null) => void
 
 class SelectionHistory<T> {
     private history: T[]
     private curr: number = -1
+
+    private selectionListeners: (SelectionListener<T>)[] = [ ]
 
     constructor() { this.history = []  }
 
@@ -137,21 +159,50 @@ class SelectionHistory<T> {
 
         this.history.push(t)
         this.curr++
+
+        this.emitSelection()
     }
 
     next() {
         if(this.curr < this.history.length - 1) {
             this.curr++
+            this.emitSelection()
         }
     }
 
     prev() {
         if(this.curr > 0) {
             this.curr--
+            this.emitSelection()
         }
+    }
+
+    empty() {
+        this.history = []
+        this.curr = -1
+
+        this.emitSelection()
     }
 
     current(): T|undefined {
         return this.history[this.curr]
+    }
+
+    addSelectionListener(listener: SelectionListener<T>) {
+        this.selectionListeners.push(listener)
+    }
+
+    removeSelectionListener(listener: SelectionListener<T>) {
+        const elIndex = this.selectionListeners.indexOf(listener)
+
+        if(elIndex > -1) {
+            this.selectionListeners.splice(elIndex, 1)
+        }
+    }
+
+    emitSelection() {
+        const curr = this.current() || null
+
+        this.selectionListeners.forEach((l) => l(curr))
     }
 }

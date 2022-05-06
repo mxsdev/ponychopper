@@ -3,6 +3,10 @@ import path from 'path'
 import { ELECTRON_CONFIG } from './config'
 import { ChopFileManager } from 'chops/chopManager'
 
+app.whenReady().then(() => {
+    createWindow()
+})
+
 // create window
 let win: BrowserWindow|null = null
 
@@ -26,12 +30,17 @@ function createWindow() {
     
 }
 
-app.whenReady().then(() => {
-    createWindow()
-    
-    // const audio_dir = path.join(__dirname, '../../../ponychopper-audio/')
-    // await manager.loadFiles(audio_dir)
+// set pinned
+ipcMain.on(ELECTRON_CONFIG.ipc_events.set_pinned, (event, pinned: boolean) => {
+    BrowserWindow.getFocusedWindow()?.setAlwaysOnTop(pinned, 'pop-up-menu')
 })
+
+// get user data directory
+ipcMain.handle(ELECTRON_CONFIG.ipc_functions.get_user_data, (event) => {
+    return app.getPath('userData')
+})
+
+
 
 // ipcMain.on('ondragstart', (event, filePath) => {
 //     event.sender.startDrag({
@@ -39,14 +48,6 @@ app.whenReady().then(() => {
 //         icon: path.join(__dirname, 'horse.png')
 //     })
 // })
-
-ipcMain.on(ELECTRON_CONFIG.ipc_events.set_pinned, (event, pinned: boolean) => {
-    BrowserWindow.getFocusedWindow()?.setAlwaysOnTop(pinned, 'pop-up-menu')
-})
-
-ipcMain.handle(ELECTRON_CONFIG.ipc_functions.get_user_data, (event) => {
-    return app.getPath('userData')
-})
 
 // ipcMain.on('onregisterglobalhotkeys', (event) => {
 //     globalShortcut.unregisterAll()

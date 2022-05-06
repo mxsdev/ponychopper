@@ -1,5 +1,5 @@
 import './css/main.css'
-import Main from './main'
+import Main from './client/main'
 import React, { ReactNode } from 'react'
 import { createRoot } from 'react-dom/client';
 

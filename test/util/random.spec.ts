@@ -1,7 +1,7 @@
 import { assert } from "chai"
 import { randomInteger } from "../../app/util/random"
 
-describe('random', () => {
+describe('random utils', () => {
     describe('randomInteger', () => {
         it('is uniformly distributed', () => {
             const results: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 }

@@ -1,21 +1,17 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from "react"
 import WaveSurfer from "wavesurfer.js"
 import {app_colors} from "app_colors.js"
-import Loader from "component/Loader"
-import { ChopID } from "main"
+import { Loader } from "client/component/ui/Loader"
 import { isDesktop } from "util/desktop"
+import { ChopSelectionListener } from "chops/chopManager"
+import { compareSelections } from "util/selection"
 
-interface OwnProps {
-    ws: WaveSurfer|null,
+type Props = {
     setWS: (ws: WaveSurfer) => void,
     chopLoading: boolean,
-    setChopLoading: (loading: boolean) => void,
-    currChopID: ChopID|null
 }
 
-type Props = OwnProps
-
-export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
+export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading }) => {
     const [showChopLoading, setShowChopLoading] = useState<boolean>(false)
 
     useEffect(() => {
@@ -28,8 +24,6 @@ export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
     }, [chopLoading])
 
     const divRender = useCallback((node: HTMLDivElement) => {
-        // file:///I:/MLP/Snippets/pp/pp_but.wav
-
         const waveshaper = WaveSurfer.create({
             container: `#${node.id}`,
             barWidth: 4,
@@ -44,12 +38,56 @@ export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
             cursorColor: 'transparent',
         })
 
-        setWS(waveshaper)    
-
+        setWS(waveshaper)   
+        
         waveshaper.on('ready', function () {
-            setChopLoading(false)
             waveshaper.play()
         })
+
+        // const selListener: ChopSelectionListener = (val) => {
+        //     setChopLoading(true)
+
+        //     // TODO: we need to abort this upon reaching another selection
+        //     api.loadBuffer()
+        //         .then((buff) => {
+        //             const curr = api.currentChop()
+
+        //             if(!curr || !(compareSelections(val, curr))) return
+                    
+        //             waveshaper.loadBlob(new Blob([buff]))
+        //         })
+        //         .catch((e) => {
+        //             console.log(e)
+        //         })
+        //         .finally(() => {
+        //             setChopLoading(false)
+        //         })
+        // }
+
+        // // console.log(api.addChopSelectionListener(selListener))
+
+        // api.addChopSelectionListener(selListener)
+
+        // return () => {
+        //     api.removeChopSelectionListener(selListener)
+        // }
+
+        // api.reloadChops('/Users/maxstoumen/Projects/ponychopper-audio')
+        //     .then((numFound) => {
+        //         console.log(`Found ${numFound} chop files!`)
+        //     })
+        //     .then(() => {
+        //         const sel = api.chop()
+
+        //         console.log(sel)
+
+        //         return api.loadBuffer()
+        //     })
+        //     .then((buff) => {
+        //         console.log(`Buffer length: ${buff.length}`)
+
+        //         waveshaper.loadBlob(new Blob([buff]))
+        //     })
 
         // @ts-ignore
         // window.electron.getChopDataBlob({episode: '0', chop_filename: 'pp_alittle.wav'}).then(data => {
@@ -62,7 +100,7 @@ export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
 
-        if(isDesktop() && !showChopLoading && currChopID) {
+        if(isDesktop() && !showChopLoading && !chopLoading) {
             // @ts-ignore
             // window.electron.startDrag(currChopID)
             // TODO: start drag
@@ -76,4 +114,4 @@ export default (({ws, setWS, chopLoading, setChopLoading, currChopID}) => {
                 {showChopLoading ? <Loader /> : <></> }
         </div>
     </>)
-}) as FunctionComponent<Props>
+}
