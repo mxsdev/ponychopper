@@ -2,45 +2,28 @@ import { app, BrowserWindow, ipcMain, contextBridge, globalShortcut, ipcRenderer
 import path from 'path'
 import { ELECTRON_CONFIG } from './config'
 import { ChopFileManager } from 'chops/chopManager'
+import { ensure_exists } from 'util/file'
+import { genDefaultChopDir, genDefaultSrcDir } from './folders'
+import { registerChopManager } from './main/manager'
+import { WindowManager } from './main/windows'
+
+const DEFAULT_USER_DATA_DIR = path.resolve(app.getPath('userData'), 'ponychopper')
+
+ensure_exists(genDefaultChopDir(DEFAULT_USER_DATA_DIR))
+ensure_exists(genDefaultSrcDir(DEFAULT_USER_DATA_DIR))
+
+const windowManager = new WindowManager()
 
 app.whenReady().then(() => {
-    createWindow()
-})
-
-// create window
-let win: BrowserWindow|null = null
-
-function createWindow() {
-    win = new BrowserWindow({
-        width: ELECTRON_CONFIG.window.width + (DEV_MODE ? 300 : 0),
-        height: ELECTRON_CONFIG.window.height,
-        webPreferences: {
-            preload: path.join(__dirname, DIST_PRELOAD)
-        }
-    })
-
-    win.setMenuBarVisibility(false)
-
-    if(DEV_MODE) {
-        win.loadURL(path.join('http://localhost:8080', DIST_INDEX_HTML))
-        win.webContents.openDevTools()
-    } else {
-        win.loadFile(path.join(__dirname, DIST_INDEX_HTML))
-    }
+    const mainWindow = windowManager.createMainWindow()
     
-}
+    registerChopManager(ipcMain, windowManager)
+})
 
 // set pinned
 ipcMain.on(ELECTRON_CONFIG.ipc_events.set_pinned, (event, pinned: boolean) => {
     BrowserWindow.getFocusedWindow()?.setAlwaysOnTop(pinned, 'pop-up-menu')
 })
-
-// get user data directory
-ipcMain.handle(ELECTRON_CONFIG.ipc_functions.get_user_data, (event) => {
-    return app.getPath('userData')
-})
-
-
 
 // ipcMain.on('ondragstart', (event, filePath) => {
 //     event.sender.startDrag({

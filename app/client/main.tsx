@@ -4,7 +4,6 @@ import { Button } from 'client/component/ui/Button'
 import DesktopMenuItems from 'client/component/menu/DesktopMenuItems'
 import { useLocalStorage } from "client/util/storage"
 import { isDesktop } from "util/desktop"
-import type { ChopSelectionListener } from "chops/chopManager"
 import { compareSelections } from "util/selection"
 import { MainContainer } from "./component/MainContainer"
 import { Header } from "./component/Header"
@@ -18,11 +17,13 @@ import { useChops } from "./util/chop"
 type Props = { }
 
 export default ((props) => {
-    const { setWS, chopLoading, controls, isPlaying } = useWaveSurfer()
-
-    const { chop, prev, next } = useChops()
+    const { setWS, chopLoading, controls, isPlaying, startDrag } = useWaveSurfer()
 
     const settings = useSettings()
+
+    const { chop, prev, next, loading: filesLoading } = useChops()
+
+    const loading = chopLoading || filesLoading
 
     return (<>
         <DesktopMenuItems 
@@ -39,11 +40,13 @@ export default ((props) => {
 
                 <WaveSection 
                     setWS={setWS}
-                    chopLoading={chopLoading}
+                    chopLoading={loading}
                     
                     onChop={chop}
                     onNext={next}
                     onPrev={prev}
+
+                    onDragStart={() => startDrag()}
                 />
             </div>
         </MainContainer>

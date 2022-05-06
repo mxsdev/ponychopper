@@ -14,6 +14,6 @@ export const useSettings = () => {
 
     return {
         globalMode, setGlobalMode,
-        pinned, setPinned
+        pinned, setPinned,
     }
 }

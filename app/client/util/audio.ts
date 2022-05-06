@@ -1,6 +1,5 @@
-import { ChopSelectionListener } from "chops/chopManager"
+import { ELECTRON_CONFIG } from "electron/config"
 import { useEffect, useState } from "react"
-import { compareSelections } from "util/selection"
 
 export const useWaveSurfer = () => {
     const [ws, setWS] = useState<WaveSurfer|null>(null)
@@ -9,36 +8,23 @@ export const useWaveSurfer = () => {
 
     const [ isPlaying, setIsPlaying ] = useState<boolean>(false)
 
+    const startDrag = () => {
+        console.log('audio.ts: startDrag called')
+
+        api.beginDrag()
+    }
+
     useEffect(() => {
         if(!ws) return
 
-        const selListener: ChopSelectionListener = (val) => {
-            if(!val) {
-                ws.empty()
-                return
-            }
+        const bufferListener = ((ev: CustomEvent<{ buff: Buffer }>) => {
+            ws?.loadBlob(new Blob([ev.detail.buff]))
+        }) as EventListener
 
-            console.log(val)
-
-            setChopLoading(true)
-
-            api.loadBuffer()
-                .then((buff) => {
-                    const curr = api.currentChop()
-
-                    if(!curr || !(compareSelections(val, curr))) return
-                    
-                    ws.loadBlob(new Blob([buff]))
-                })
-                .catch((e) => {
-                    console.error('Error loading chop buffer', e)
-                })
-                .finally(() => {
-                    setChopLoading(false)
-                })
-        }
-
-        api.addChopSelectionListener(selListener)
+        window.addEventListener(
+            ELECTRON_CONFIG.window_events.chop.buffer,
+            bufferListener
+        )
 
         const onEnd = () => setIsPlaying(false)
         const onStart = () => setIsPlaying(true)
@@ -48,7 +34,10 @@ export const useWaveSurfer = () => {
         ws.on('finish', onEnd)
 
         return () => {
-            api.removeChopSelectionListener(selListener)
+            window.removeEventListener(
+                ELECTRON_CONFIG.window_events.chop.buffer, 
+                bufferListener
+            )
 
             ws.un('play', onStart)
             ws.un('pause', onEnd)
@@ -61,5 +50,5 @@ export const useWaveSurfer = () => {
         restart: () => ws?.play(0),
     }
 
-    return { setWS, chopLoading, controls, isPlaying }
+    return { setWS, chopLoading, controls, isPlaying, startDrag }
 }

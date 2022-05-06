@@ -3,9 +3,12 @@ import { getWaveMeta, WaveMeta } from '../util/riff'
 import { getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
-import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopSelector, createChopSelector, FilterOpts, chopFileSummary } from './chops'
+import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopSelector, createChopSelector, FilterOpts, chopFileSummary, ChopFileSummary } from './chops'
 import path from 'path'
 import fs from 'fs/promises'
+import EventEmitter from 'events'
+import TypedEmitter from "typed-emitter"
+import { HighlightSharp } from '@mui/icons-material'
 
 export async function createChopFileManager(fileDir: PathLike) {
     const manager = new ChopFileManager()
@@ -15,22 +18,40 @@ export async function createChopFileManager(fileDir: PathLike) {
     return manager
 }
 
-export type ChopSelectionListener = SelectionListener<ChopSelection>
+export type ChopFileStatus = {
+    loading: boolean,
+    summary?: ChopFileSummary
+}
 
-export class ChopFileManager {
+type ChopFileManagerMessages = new () => TypedEmitter<{
+    'select': (selection: ChopSelection|null) => void,
+    'buffer': (buffer: Buffer) => void,
+    'fileStatus': (status: ChopFileStatus) => void
+}>
+
+export class ChopFileManager extends (EventEmitter as ChopFileManagerMessages) {
     private files: ChopFile[] = [ ]
 
-    private selection = new SelectionHistory<ChopSelection>()
+    private selection = new SelectionHistory()
 
     private selector: ChopSelector|null = null
     private filterOpts: FilterOpts = { }
     private selectionList: ChopSelection[] = [ ]
 
-    constructor() { }
+    constructor() {
+        super()
+
+        this.selection.on('select', (selection) => {
+            this.emit('select', selection)
+            if(selection) this.buffer()
+        })
+    }
 
     async loadFiles(fileDir: PathLike) {
         // TODO: load files from directory
         this.files = [ ]
+
+        this.emit('fileStatus', { loading: true })
 
         const folder = fileDir.toString()
         const files = await getFilesRecursively(folder)
@@ -62,7 +83,15 @@ export class ChopFileManager {
 
         this.filter(this.filterOpts)
 
-        return this.fileSummary()
+        const summary = this.fileSummary()
+
+        this.emit('fileStatus', { loading: false, summary })
+
+        return summary
+    }
+
+    emitFileStatus() {
+
     }
 
     fileSummary() {
@@ -95,9 +124,9 @@ export class ChopFileManager {
 
         if(!curr || !curr_file) throw new Error('Cannot get buffer without selection')
 
-        if(curr.buffer) return curr.buffer
+        const buff = curr.buffer ?? await selectionToBuffer(curr.pos, curr_file)
 
-        const buff = await selectionToBuffer(curr.pos, curr_file)
+        this.emit('buffer', buff)
 
         curr.buffer = buff
 
@@ -118,8 +147,6 @@ export class ChopFileManager {
     }
 
     prev() {
-        console.log('got here ksjnfksjdf')
-
         this.selection.prev()
         return this.current()
     }
@@ -136,27 +163,20 @@ export class ChopFileManager {
     empty() {
         this.selection.empty()
     }
-
-    addSelectionListener(listener: ChopSelectionListener) { 
-        this.selection.addSelectionListener(listener) 
-    }
-
-    removeSelectionListener(listener: ChopSelectionListener) {
-        this.selection.removeSelectionListener(listener)
-    }
 }
 
-type SelectionListener<T> = (val: T|null) => void
+type HistoryMessages<T> = new () => TypedEmitter<{ 'select': ( selection: T|null ) => void }>
 
-class SelectionHistory<T> {
-    private history: T[]
+class SelectionHistory extends (EventEmitter as HistoryMessages<ChopSelection>) {
+    private history: ChopSelection[]
     private curr: number = -1
 
-    private selectionListeners: (SelectionListener<T>)[] = [ ]
+    constructor() { 
+        super()
+        this.history = []  
+    }
 
-    constructor() { this.history = []  }
-
-    push(t: T) {
+    push(t: ChopSelection) {
         this.history.splice(this.curr + 1, this.history.length)
 
         this.history.push(t)
@@ -186,25 +206,14 @@ class SelectionHistory<T> {
         this.emitSelection()
     }
 
-    current(): T|undefined {
+    current(): ChopSelection|undefined {
         return this.history[this.curr]
-    }
-
-    addSelectionListener(listener: SelectionListener<T>) {
-        this.selectionListeners.push(listener)
-    }
-
-    removeSelectionListener(listener: SelectionListener<T>) {
-        const elIndex = this.selectionListeners.indexOf(listener)
-
-        if(elIndex > -1) {
-            this.selectionListeners.splice(elIndex, 1)
-        }
     }
 
     emitSelection() {
         const curr = this.current() || null
 
-        this.selectionListeners.forEach((l) => l(curr))
+        // this.selectionListeners.forEach((l) => l(curr))
+        this.emit('select', curr)
     }
 }

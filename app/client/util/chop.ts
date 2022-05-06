@@ -1,10 +1,11 @@
 import { Paid } from "@mui/icons-material"
+import { ChopFileStatus } from "chops/chopManager"
 import { ChopFileSummary, FilterOpts } from "chops/chops"
+import { ELECTRON_CONFIG } from "electron/config"
 import { useEffect, useState } from "react"
 
 export const useChops = () => {
     const [ loading, setLoading ] = useState<boolean>(true)
-    const [ sourceFileDir, setSourceFileDir ] = useState<string|null>(null)
 
     const [ chopSummary, setChopSummary ] = useState<ChopFileSummary|null>(null)
 
@@ -16,30 +17,51 @@ export const useChops = () => {
         _setFilter({ ...filter, ...opts })
     }
 
-    const loadChops = async (dir: string) => {
-        setLoading(true)
-
-        const summary = await api.loadChops(dir)
-
-        if(!loading) return
-
-        setChopSummary(summary)
-        if(summary) setLoading(false)
-
-        return summary
-    }
-    
     useEffect(() => {
-        // api.defaultChopDirectory()
-        //     .then(v => console.log(`Default chop directory: ${v}`))
+        const EVT_FILESTATUS = ELECTRON_CONFIG.window_events.chop.filesStatus
 
-        loadChops('/Users/maxstoumen/Projects/ponychopper-audio')
+        const fileStatusListener = (({ detail: { status } }: CustomEvent<{ status: ChopFileStatus }>) => {
+            setLoading(status.loading)
+
+            if(status.summary) {
+                console.log(status.summary)
+                setChopSummary(status.summary)
+            }
+        }) as EventListener
+
+        window.addEventListener(
+            EVT_FILESTATUS, 
+            fileStatusListener
+        )
+
+        return () => {
+            window.removeEventListener(
+                EVT_FILESTATUS,
+                fileStatusListener
+            )
+        }
+    }, [])
+
+    useEffect(() => {
+        api.signalReady()
     }, [])
 
     useEffect(() => {
         if(loading) return
         api.filter(filter)
     }, [filter, loading])
+
+    // useEffect(() => {
+    //     const bufferListener = (ev: CustomEvent<{ buff: Buffer }>) => {
+            
+    //     }
+
+    //     window.addEventListener(ELECTRON_CONFIG.window_events.chop.buffer, )
+    // }, [])
+
+    useEffect(() => {
+
+    })
 
     const chop = () => api.chop()
     const prev = () => api.prevChop()
@@ -48,6 +70,7 @@ export const useChops = () => {
     return {
         loading,
         chopsEnabled,
+        
         updateFilter, filter,
 
         chop,

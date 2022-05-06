@@ -1,51 +1,63 @@
-import { ChopFileManager, ChopSelectionListener } from 'chops/chopManager';
+import { ChopFileManager, ChopFileStatus } from 'chops/chopManager';
+import { ChopSelection } from 'chops/chops';
+import { ipcRenderer } from 'electron';
+import { ELECTRON_CONFIG } from 'electron/config';
 import fs from 'fs/promises'
 import { exists } from "util/file";
 
-const manager = new ChopFileManager()
+// export async function loadChops(dir: string) {
+//     if(!(await exists(dir))) return null
+//     if(!(await fs.stat(dir)).isDirectory()) return null
 
-export async function loadChops(dir: string) {
-    if(!(await exists(dir))) return null
-    if(!(await fs.stat(dir)).isDirectory()) return null
+//     return await manager.loadFiles(dir)
+// }
 
-    return await manager.loadFiles(dir)
+export function beginDrag() {
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.drag_start)
 }
 
 export function filter(opts: FilterOpts) {
-    return manager.filter(opts)
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.chop.filter, opts)
 }
 
 export function chop() {
-    return manager.chop()
-}
-
-export async function loadBuffer() {
-    return manager.buffer()
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.chop.chop)
 }
 
 export function prevChop() {
-    manager.prev()
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.chop.prev)
 }
 
 export function nextChop() {
-    manager.next()
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.chop.next)
 }
 
-export function numFiles() {
-    return manager.numFiles()
+export function signalReady() {
+    ipcRenderer.send(ELECTRON_CONFIG.ipc_events.chop.ready)
 }
 
-export function currentChop() {
-    return manager.current()
-}
+// TODO: unify typings here
 
-export function addChopSelectionListener(listener: ChopSelectionListener) {
-    manager.addSelectionListener(listener)
-}
+ipcRenderer.on(ELECTRON_CONFIG.web_events.chop.buffer, (event, buff: Buffer) => {
+    if(!buff) return
+    window.dispatchEvent(new CustomEvent(ELECTRON_CONFIG.window_events.chop.buffer, { detail: { buff } } ))
+})
 
-export function removeChopSelectionListener(listener: ChopSelectionListener) {
-    manager.removeSelectionListener(listener)
-}
+ipcRenderer.on(ELECTRON_CONFIG.web_events.chop.selection, (event, selection: ChopSelection|null) => {
+    window.dispatchEvent(new CustomEvent(ELECTRON_CONFIG.window_events.chop.selection, { detail: { selection }}))
+})
+
+ipcRenderer.on(ELECTRON_CONFIG.web_events.chop.filesStatus, (event, status: ChopFileStatus) => {
+    window.dispatchEvent(new CustomEvent(ELECTRON_CONFIG.window_events.chop.filesStatus, { detail: { status } }))
+})
+
+// export function addChopSelectionListener(listener: ChopSelectionListener) {
+//     manager.addSelectionListener(listener)
+// }
+
+// export function removeChopSelectionListener(listener: ChopSelectionListener) {
+//     manager.removeSelectionListener(listener)
+// }
 
 // export const addChopSelectionListener = manager.addSelectionListener
 // export const removeChopSelectionListener = manager.removeSelectionListener
