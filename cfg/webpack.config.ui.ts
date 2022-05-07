@@ -10,7 +10,6 @@ import 'webpack-dev-server'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import ReactRefreshTypeScript from 'react-refresh-typescript'
-import WebpackBar from 'webpackbar'
 // const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 // const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 // const ReactRefreshTypeScript = require('react-refresh-typescript')

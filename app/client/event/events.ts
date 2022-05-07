@@ -27,7 +27,7 @@ export type PCEventListener<C extends keyof WindowEvents> = (event: CustomEvent<
 export function AddEventListener<C extends keyof WindowEvents>(channel: C, handler: PCEventListener<C>, options?: AddEventListenerOptions) {
     window.addEventListener(channel, handler as EventListener, options)
 
-    return (options?: EventListenerOptions) => RemoveEventListener(channel, handler)
+    // return (options?: EventListenerOptions) => RemoveEventListener(channel, handler)
 }
 
 export function RemoveEventListener<C extends keyof WindowEvents>(channel: C, handler: PCEventListener<C>, options?: EventListenerOptions) {

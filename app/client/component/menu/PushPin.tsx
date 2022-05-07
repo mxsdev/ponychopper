@@ -2,9 +2,6 @@ import React, { FunctionComponent, useEffect } from "react"
 import { useLocalStorage } from "client/util/storage"
 import { isDesktop } from "util/desktop"
 
-// import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
-// import PushPinIcon from '@mui/icons-material/PushPin';
-
 type Props = {
     pinned: boolean,
     onClick: () => void,

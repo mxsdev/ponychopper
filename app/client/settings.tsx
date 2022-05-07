@@ -1,6 +1,5 @@
 import { UserSettingsData } from "electron/main/settings"
 import React, { FunctionComponent, useEffect, useState } from "react"
-import { Button } from "./component/ui/Button"
 import { AddEventListener, PCEventListener, RemoveEventListener } from "./event/events"
 import { useChopFileSummary } from "./util/fileSummary"
 import { getDirectory, useUserSettings } from "./util/userSettings"
@@ -20,7 +19,7 @@ export const Settings: FunctionComponent<Props> = (props) => {
     // signal ready status
     useEffect(() => {
         api.signalReady('settings')
-    })
+    }, [])
 
     const { loading, chopSummary } = useChopFileSummary()
 
@@ -28,32 +27,32 @@ export const Settings: FunctionComponent<Props> = (props) => {
     const srcDirEnabled = !!userSettings.srcDir
 
     return (<>
-        Settings page
+        {/* Settings page
         <br/> <br/>
 
         <strong>Chop directory:</strong>
-        <p>{userSettings.chopDir}</p>
-        <Button onClick={() => {
+        <p>{userSettings.chopDir}</p> */}
+        {/* <Button onClick={() => {
             getDirectory({ defaultDirectory: userSettings.chopDir })
                 .then(({ path }) => {
                     if(path) updateSettings({ chopDir: path })
                 })
         }}>
             select folder
-        </Button>
-        <br/> <br />
+        </Button> */}
+        {/* <br/> <br />
 
         <strong>Source directory:</strong>
-        <p>{userSettings.srcDir}</p>
-        <Button onClick={() => {
+        <p>{userSettings.srcDir}</p> */}
+        {/* <Button onClick={() => {
             getDirectory({ defaultDirectory: userSettings.srcDir })
                 .then(({ path }) => {
                     if(path) updateSettings({ srcDir: path })
                 })
         }}>
             select folder
-        </Button>
-        <p>{loading ? 'Loading...' : `Found ${chopSummary?.numFiles} files!`}</p>
-        <br/>
+        </Button> */}
+        {/* <p>{loading ? 'Loading...' : `Found ${chopSummary?.numFiles} files!`}</p>
+        <br/> */}
     </>)
 }

@@ -9,6 +9,14 @@ import { TypedEmitterInstance } from 'util/emitter';
 export type UserSettingsData = {
     srcDir: string,
     chopDir: string,
+
+    localHotkeys: {
+
+    },
+
+    globalHotkeys: {
+
+    }
 }
 
 export class UserSettingsManager extends (EventEmitter as TypedEmitterInstance<{
@@ -28,6 +36,15 @@ export class UserSettingsManager extends (EventEmitter as TypedEmitterInstance<{
                 chopDir: {
                     type: 'string',
                     default: DEFAULT_CHOP_DIR
+                },
+                
+                localHotkeys: {
+                    type: 'object',
+                    properties: { }
+                },
+                globalHotkeys: {
+                    type: 'object',
+                    properties: { }
                 }
             },
             name: storeName,
@@ -36,8 +53,10 @@ export class UserSettingsManager extends (EventEmitter as TypedEmitterInstance<{
 
     getSettings(): UserSettingsData {
         return ({
-            srcDir: this.store.get<string, string>('srcDir'),
-            chopDir: this.store.get<string, string>('chopDir')
+            srcDir: this.store.get('srcDir'),
+            chopDir: this.store.get('chopDir'),
+            localHotkeys: this.store.get('localHotkeys'),
+            globalHotkeys: this.store.get('globalHotkeys')
         })
     }
 

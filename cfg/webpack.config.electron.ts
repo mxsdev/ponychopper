@@ -1,4 +1,3 @@
-import WebpackBar from 'webpackbar';
 import path from 'path'
 import fs from 'fs'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'

@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 
 export const useUserSettings = () => {
     const [ userSettings, _setUserSettings ] = useState<UserSettingsData>({
-        chopDir: '', srcDir: ''
+        chopDir: '', srcDir: '',
+        localHotkeys: { },
+        globalHotkeys: { }
     })
 
     // listen for settings changes
@@ -18,9 +20,9 @@ export const useUserSettings = () => {
 
         AddEventListener('update_settings', settingsListener)
 
-        return () => {
-            RemoveEventListener('update_settings', settingsListener)
-        }
+        // return () => {
+        //     RemoveEventListener('update_settings', settingsListener)
+        // }
     }, [])
 
     const updateSettings = (update: Partial<UserSettingsData>) => {

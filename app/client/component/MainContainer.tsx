@@ -9,7 +9,7 @@ type Props = PropsWithChildren<OwnProps>
 
 export const MainContainer: FunctionComponent<Props> = ({children, className}) => {
     return (<>
-        <div className={cl("w-full max-w-[500px] mx-auto p-4", className)}>
+        <div>
             {children}
         </div>
     </>)

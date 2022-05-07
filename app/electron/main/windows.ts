@@ -7,12 +7,14 @@ import { IPCMainListen, IPCMainSend, IPCMainUnlisten } from 'electron/ipc/ipcmai
 
 export type WindowType = 'main'|'settings'
 
-function createWindow(opts: { width: number, height: number, mode: WindowType, parent?: BrowserWindow, show?: boolean }): BrowserWindow {
+function createWindow(opts: { width: number, height: number, minWidth?: number, mode: WindowType, parent?: BrowserWindow, show?: boolean }): BrowserWindow {
     const DO_DEV_TOOLS = DEV_MODE && (opts.mode === 'main')
 
     const win = new BrowserWindow({
         width: opts.width + (DO_DEV_TOOLS ? 300 : 0),
         height: opts.height,
+        minWidth: opts.minWidth,
+
         webPreferences: {
             preload: path.join(__dirname, DIST_PRELOAD)
         },
@@ -87,6 +89,7 @@ export class WindowManager extends (EventEmitter as TypedEmitterInstance<{
         const win = createWindow({ 
             width: ELECTRON_CONFIG.window.main.width, 
             height: ELECTRON_CONFIG.window.main.height,
+            minWidth: ELECTRON_CONFIG.window.main.minWidth,
             mode: 'main'
         })
 

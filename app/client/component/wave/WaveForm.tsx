@@ -1,17 +1,17 @@
 import React, { FunctionComponent, useCallback, useContext, useEffect, useState } from "react"
 import WaveSurfer from "wavesurfer.js"
-import {app_colors} from "app_colors.js"
-import { Loader } from "client/component/ui/Loader"
 import { isDesktop } from "util/desktop"
 import { compareSelections } from "util/selection"
+import { COL_PRIMARY } from "client/ui/colors"
 
 type Props = {
     setWS: (ws: WaveSurfer) => void,
     chopLoading: boolean,
-    onDragStart?: () => void
+    onDragStart?: () => void,
+    className?: string
 }
 
-export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading, onDragStart: _onDragStart }) => {
+export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading, onDragStart: _onDragStart, className }) => {
     const [showChopLoading, setShowChopLoading] = useState<boolean>(false)
 
     useEffect(() => {
@@ -32,10 +32,11 @@ export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading, onDragS
             barHeight: 3,
 
             height: 150,
-            progressColor: app_colors.acc['2'],
-            responsive: true,
+            progressColor: COL_PRIMARY[4],
             waveColor: '#EFEFEF',
+
             cursorColor: 'transparent',
+            hideScrollbar: true
         })
 
         setWS(waveshaper)   
@@ -55,9 +56,11 @@ export const WaveForm: FunctionComponent<Props> = ({ setWS, chopLoading, onDragS
 
     return (<>
         <div id="waveform" 
-        ref={divRender} 
-        className={`w-[250px] h-[150px] bg-black py-1 px-5 bg-opacity-10 rounded-md flex flex-col align-center justify-center ${showChopLoading ? 'loading' : ''}`} draggable={true} onDragStart={onDragStart}>
-                {showChopLoading ? <Loader /> : <></> }
+            ref={divRender}
+            className={className}
+            draggable={true}
+            onDragStart={onDragStart}>
+                {showChopLoading ? <></> : <></> }        
         </div>
     </>)
 }

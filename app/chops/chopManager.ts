@@ -8,7 +8,6 @@ import path from 'path'
 import fs from 'fs'
 import EventEmitter from 'events'
 import TypedEmitter from "typed-emitter"
-import { HighlightSharp } from '@mui/icons-material'
 import { TypedEmitterInstance } from 'util/emitter'
 import shortid from 'short-uuid'
 
