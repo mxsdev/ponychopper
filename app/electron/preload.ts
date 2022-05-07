@@ -8,3 +8,7 @@ contextBridge.exposeInMainWorld('api', api)
 IPCRendererListen('settingsWindow', (ev, opened) => {
     DispatchEvent('settings_window_status', { opened })
 })
+
+IPCRendererListen('update_settings', (ev, update) => {
+    DispatchEvent('update_settings', { update })
+})

@@ -1,15 +1,16 @@
 import type { PathLike } from 'fs'
 import { getWaveMeta, WaveMeta } from '../util/riff'
-import { getFilesRecursively } from '../util/file'
+import { exists, getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
 import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopSelector, createChopSelector, FilterOpts, chopFileSummary, ChopFileSummary } from './chops'
 import path from 'path'
-import fs from 'fs/promises'
+import fs from 'fs'
 import EventEmitter from 'events'
 import TypedEmitter from "typed-emitter"
 import { HighlightSharp } from '@mui/icons-material'
 import { TypedEmitterInstance } from 'util/emitter'
+import shortid from 'short-uuid'
 
 export async function createChopFileManager(fileDir: PathLike) {
     const manager = new ChopFileManager()
@@ -41,6 +42,8 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
     private filterOpts: FilterOpts = { }
     private selectionList: ChopSelection[] = [ ]
 
+    private uuid = shortid()
+
     constructor() {
         super()
 
@@ -62,7 +65,7 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
             const extname = path.extname(f).toLowerCase()
             if(extname !== '.wav') return
 
-            const handle = await fs.open(f, 'r')
+            const handle = await fs.promises.open(f, 'r')
 
             try {
                 const { size } = await handle.stat()
@@ -125,7 +128,7 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         return this.files[curr.fileIndex]?.location
     }
 
-    async buffer(): Promise<Buffer> {
+    async buffer(emit: boolean = true): Promise<Buffer> {
         const curr = this.current()
         const curr_file = this.currentFile()
 
@@ -133,11 +136,38 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
 
         const buff = curr.buffer ?? await selectionToBuffer(curr.pos, curr_file)
 
-        this.emit('buffer', buff)
+        if(emit) this.emit('buffer', buff)
 
         curr.buffer = buff
 
         return buff
+    }
+
+    async writeFile(dir: string) {
+        const curr = this.current()
+
+        if(!curr) throw new Error('No selection!')
+
+        const old_file = curr.file
+
+        if(old_file) {
+            const old_file_exists = await exists(old_file)
+            if(old_file_exists) return old_file
+        }
+
+        const uuid = this.uuid.generate().toString()
+
+        const filename = `${curr.speakers.join('-')}_${curr.speech}_${uuid}.wav`
+
+        const buff = await this.buffer(false)
+
+        const filepath = path.join(dir, filename)
+
+        await fs.promises.writeFile(filepath, buff)
+
+        curr.file = filepath
+
+        return filepath
     }
 
     numSelections() {

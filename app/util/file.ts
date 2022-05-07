@@ -14,9 +14,7 @@ export async function getFilesRecursively(dir: string): Promise<string[]> {
 }
 
 export async function exists(file: fs.PathLike) {
-    return fs.promises.access(file, fs.constants.F_OK)
-        .then(() => true)
-        .catch(() => false)
+    return fs.promises.stat(file).then(() => true, () => false);
 }
 
 export function ensure_exists(dir: string) {

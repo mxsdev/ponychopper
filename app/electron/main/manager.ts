@@ -5,14 +5,12 @@ import { WindowManager } from "./windows";
 import fs from 'fs'
 import path from 'path'
 import { IPCMainListen, IPCMainSend } from "electron/ipc/ipcmain";
-import { UserSettings } from "./settings";
+import { UserSettingsManager } from "./settings";
 
-export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager) {
+export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager, userSettings: UserSettingsManager) {
     const manager = new ChopFileManager()
 
-    const srcDir = UserSettings.get<string, string>('srcDir')
-    
-    manager.loadFiles(srcDir)
+    manager.loadFiles(userSettings.get('srcDir'))
 
     IPCMainListen('filter', (event, filter) => {
         if(!filter) return
@@ -22,18 +20,10 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager)
     IPCMainListen('drag_start', (event) => {
         if(!manager.current()) return
 
-        // TODO: move this code to manager class
-        manager.buffer()
-            .then(async (buff) => {
-                const fname = path.join('/Users/maxstoumen/Music/choptest', 'test.wav')
-
-                await fs.promises.writeFile(fname, buff)
-
-                return fname
-            })
-            .then((fname) => {
+        manager.writeFile(userSettings.get('chopDir'))
+            .then((file) => {
                 event.sender.startDrag({
-                    file: fname,
+                    file,
                     icon: '/Users/maxstoumen/Projects/ponychopper/assets/horse.png'
                 })
             })
@@ -52,9 +42,7 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager)
     })
 
     IPCMainListen('ready', (event, from) => {
-        if(from === 'main') {
-            IPCMainSend(event.sender, 'filesStatus', manager.getFileStatus())
-        }
+        IPCMainSend(event.sender, 'filesStatus', manager.getFileStatus())
     })
 
     manager.on('buffer', (buff) => {
@@ -67,5 +55,13 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager)
 
     manager.on('fileStatus', (status) => {
         windows.getAllWindows().forEach(win => IPCMainSend(win.webContents, 'filesStatus', status))
+    })
+
+    userSettings.on('update', ({srcDir}, {srcDir: oldSrcDir}) => {
+        if(srcDir && srcDir !== oldSrcDir) {
+            console.log(`Source directory changed to : ${srcDir}`)
+
+            manager.loadFiles(srcDir)
+        }
     })
 }

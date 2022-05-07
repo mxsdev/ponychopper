@@ -86,7 +86,8 @@ export type ChopSelection = {
     fragmentIndex: number,
     fragmentLength: number,
 
-    buffer?: Buffer
+    buffer?: Buffer,
+    file?: string
 }
 
 export const regionContains = (region: ChopPosRegion, index: ChopPosIndex|ChopPosRegion) => {

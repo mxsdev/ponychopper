@@ -1,5 +1,6 @@
 import { ChopFileStatus } from "chops/chopManager"
 import { ChopSelection, FilterOpts } from "chops/chops"
+import { UserSettingsData } from "electron/main/settings"
 import { WindowType } from "electron/main/windows"
 
 type EventList<T extends { [key: string]: any[] }> = T
@@ -9,7 +10,7 @@ type EventList<T extends { [key: string]: any[] }> = T
  */
 export type IPCRendererEvents = EventList<{
     set_pinned: [ pinned: boolean ],
-    drag_start: [ ]
+    drag_start: [ ],
 
     filter: [ opts: FilterOpts ],
     chop: [ ],
@@ -18,7 +19,9 @@ export type IPCRendererEvents = EventList<{
 
     ready: [ from: WindowType ],
     
-    toggle_settings: [ ]
+    toggle_settings: [ ],
+
+    update_settings: [ settings: Partial<UserSettingsData> ]
 }>
 
 /**
@@ -29,5 +32,7 @@ export type IPCMainEvents = EventList<{
     selection: [ sel: ChopSelection|null ],
     filesStatus: [ status: ChopFileStatus ],
 
-    settingsWindow: [ opened: boolean ]
+    settingsWindow: [ opened: boolean ],
+
+    update_settings: [ settings: Partial<UserSettingsData> ]
 }>

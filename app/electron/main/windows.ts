@@ -155,7 +155,11 @@ export class WindowManager extends (EventEmitter as TypedEmitterInstance<{
         )
     }
     
-    getMainWindow(): BrowserWindow|null {
-        return this.mainWindow
+    getMainWindow() { return this.mainWindow }
+
+    getSettingsWindow() { return this.settingsWindow }
+
+    findWindow(id: number) {
+        return [...this.getAllWindows()].find((win) => win.webContents.id === id)
     }
 }

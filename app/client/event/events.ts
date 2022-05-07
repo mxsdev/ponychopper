@@ -1,5 +1,6 @@
 import { ChopFileStatus } from "chops/chopManager"
 import { ChopSelection } from "chops/chops"
+import { UserSettingsData } from "electron/main/settings"
 
 type EventList<T extends { [channel: string]: Record<string, any> }> = T
 
@@ -15,6 +16,9 @@ export type WindowEvents = EventList<{
     },
     settings_window_status: {
         opened: boolean
+    },
+    update_settings: {
+        update: Partial<UserSettingsData>
     }
 }>
 
@@ -22,6 +26,8 @@ export type PCEventListener<C extends keyof WindowEvents> = (event: CustomEvent<
 
 export function AddEventListener<C extends keyof WindowEvents>(channel: C, handler: PCEventListener<C>, options?: AddEventListenerOptions) {
     window.addEventListener(channel, handler as EventListener, options)
+
+    return (options?: EventListenerOptions) => RemoveEventListener(channel, handler)
 }
 
 export function RemoveEventListener<C extends keyof WindowEvents>(channel: C, handler: PCEventListener<C>, options?: EventListenerOptions) {
