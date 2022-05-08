@@ -5,7 +5,7 @@ import type { JSONSchema } from 'json-schema-typed'
 import { DEFAULT_CHOP_DIR, DEFAULT_SRC_DIR } from './directory'
 import { WindowManager } from './windows'
 import { TypedEmitterInstance } from 'util/emitter';
-import { Hotkey, HotkeyIDs } from 'util/hotkeys';
+import { Hotkey, HotkeyIDs, HotkeyList } from 'util/hotkeys';
 import { HotkeyId } from 'util/hotkeys';
 
 const ctrlOrCommand = process.platform === 'darwin' ? { meta: true } : { command: true }
@@ -42,13 +42,9 @@ export type UserSettingsData = {
     srcDir: string,
     chopDir: string,
 
-    localHotkeys: {
-        [id in HotkeyId]?: Hotkey
-    },
+    localHotkeys: HotkeyList,
 
-    globalHotkeys: {
-        [id in HotkeyId]?: Hotkey
-    },
+    globalHotkeys: HotkeyList,
 
     globalHotkeysEnabled: boolean
 }
@@ -150,7 +146,6 @@ export class UserSettingsManager extends (EventEmitter as TypedEmitterInstance<{
 
     registerSettingsIPC(windows: WindowManager) {
         IPCMainListen('ready', ({sender}, from) => {
-            if(from !== 'settings') return
             IPCMainSend(sender, 'update_settings', this.getSettings())
         })
         

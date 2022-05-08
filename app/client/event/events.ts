@@ -19,7 +19,9 @@ export type WindowEvents = EventList<{
     },
     update_settings: {
         update: Partial<UserSettingsData>
-    }
+    },
+    playback_toggle_play: { },
+    playback_restart: { }
 }>
 
 export type PCEventListener<C extends keyof WindowEvents> = (event: CustomEvent<WindowEvents[C]>) => void

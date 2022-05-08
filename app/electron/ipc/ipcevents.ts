@@ -35,4 +35,7 @@ export type IPCMainEvents = EventList<{
     settingsWindow: [ opened: boolean ],
 
     update_settings: [ settings: Partial<UserSettingsData> ]
+
+    playback_toggle_play: [],
+    playback_restart: []
 }>

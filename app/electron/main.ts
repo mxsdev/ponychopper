@@ -8,6 +8,7 @@ import { registerChopManager } from './main/manager'
 import { WindowManager } from './main/windows'
 import { IPCMainHandle, IPCMainListen } from './ipc/ipcmain'
 import { UserSettingsManager } from './main/settings'
+import { registerGlobalHotkeysIPC } from './main/globalHotkeys'
 
 const windowManager = new WindowManager()
 windowManager.registerIPCListeners()
@@ -17,10 +18,10 @@ export const userSettings = new UserSettingsManager('usersettings')
 app.whenReady().then(() => {
     windowManager.createMainWindow()
 
-    console.log(app.getPath('userData'))
-
-    registerChopManager(ipcMain, windowManager, userSettings)
+    const chopFileManager = registerChopManager(ipcMain, windowManager, userSettings)
     userSettings.registerSettingsIPC(windowManager)
+
+    registerGlobalHotkeysIPC(userSettings, chopFileManager, windowManager)
 })
 
 // set pinned

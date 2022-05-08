@@ -3,7 +3,7 @@ import { ChopSelection } from 'chops/chops';
 import { DispatchEvent } from 'client/event/events';
 import { ipcRenderer } from 'electron';
 import { ELECTRON_CONFIG } from 'electron/config';
-import { IPCRendererListen, IPCRendererSend } from 'electron/ipc/ipcrenderer';
+import { IPCRendererInvoke, IPCRendererListen, IPCRendererSend } from 'electron/ipc/ipcrenderer';
 import { WindowType } from 'electron/main/windows';
 import fs from 'fs/promises'
 import { exists } from "util/file";
@@ -37,6 +37,10 @@ export function nextChop() {
 
 export function signalReady(from: WindowType) {
     IPCRendererSend('ready', from)
+}
+
+export function reloadFiles() {
+    return IPCRendererInvoke('load_files')
 }
 
 IPCRendererListen('buffer', (event, buff: Buffer) => {

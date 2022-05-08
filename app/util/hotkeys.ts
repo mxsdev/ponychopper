@@ -3,13 +3,11 @@ export const HotkeyIDs = [ 'play_pause', 'chop', 'prev', 'next', 'replay', 'expa
 
 export type HotkeyId = typeof HotkeyIDs[number]
 
-type HotkeyList = { [index in HotkeyId]: {
+type HotkeyMeta = { [index in HotkeyId]: {
     label: string,
-    // defaultLocalHotkey?: Hotkey,
-    // defaultGlobalHotkey?: Hotkey
 } }
 
-export const hotkeys: HotkeyList = {
+export const hotkeys: HotkeyMeta = {
     play_pause: {
         label: 'Play/Pause',
     },
@@ -33,6 +31,8 @@ export const hotkeys: HotkeyList = {
     }
 }
 
+export type HotkeyList = { [index in HotkeyId]?: Hotkey }
+
 export type Hotkey = {
     mod?: {
         meta?: boolean,
@@ -50,10 +50,25 @@ function isKeyComplete(key: string): boolean {
         || key === 'Shift' )
 }
 
-export function keyboardEventToHotkey(event: Pick<KeyboardEvent, 'key'|'getModifierState'>): Hotkey {
-    let key = event.key
+function jsKeyToElectronKey(key: string): Electron.Accelerator {
+    switch(key) {
+        case ' ':
+            return 'Space'
+        case 'ArrowRight':
+            return 'Right'
+        case 'ArrowLeft':
+            return 'Left'
+        case 'ArrowDown':
+            return 'Down'
+        case 'ArrowUp':
+            return 'Up'
+        default:
+            return key
+    }
+}
 
-    if(key === ' ') key = 'Space'
+export function keyboardEventToHotkey(event: Pick<KeyboardEvent, 'key'|'getModifierState'>): Hotkey {
+    const { key } = event
 
     const singleKey = key.length === 1
 
@@ -97,7 +112,9 @@ export function hotkeyToString(hotkey: Hotkey): string {
     const modifierStr = modifierStack.join('+')
 
     if(!hotkey.key) return modifierStr
-    if(modifierStack.length === 0) return hotkey.key
+    const key = jsKeyToElectronKey(hotkey.key) as string
 
-    return `${modifierStr}+${hotkey.key}`
+    if(modifierStack.length === 0) return key
+
+    return `${modifierStr}+${key}`
 }

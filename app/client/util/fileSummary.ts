@@ -25,5 +25,14 @@ export const useChopFileSummary = () => {
         }
     }, [])
 
-    return { chopSummary, loading, chopsEnabled }
+    const reloadFiles = () => api.reloadFiles()
+        .then((summ) => {
+            alert(`Found ${summ.numFiles} file(s).`)
+        })
+        .catch((e) => {
+            console.log(e)
+            alert(`Error loading files.`)
+        })
+
+    return { chopSummary, loading, chopsEnabled, reloadFiles }
 }

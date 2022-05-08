@@ -4,7 +4,7 @@ import { ELECTRON_CONFIG } from "electron/config";
 import { WindowManager } from "./windows";
 import fs from 'fs'
 import path from 'path'
-import { IPCMainListen, IPCMainSend } from "electron/ipc/ipcmain";
+import { IPCMainHandle, IPCMainListen, IPCMainSend } from "electron/ipc/ipcmain";
 import { UserSettingsManager } from "./settings";
 
 export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager, userSettings: UserSettingsManager) {
@@ -59,9 +59,11 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
 
     userSettings.on('update', ({srcDir}, {srcDir: oldSrcDir}) => {
         if(srcDir && srcDir !== oldSrcDir) {
-            console.log(`Source directory changed to : ${srcDir}`)
-
             manager.loadFiles(srcDir)
         }
     })
+
+    IPCMainHandle('load_files', () => manager.loadFiles(userSettings.get('srcDir')))
+
+    return manager
 }

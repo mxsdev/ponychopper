@@ -3,9 +3,9 @@ import React, { FunctionComponent, PropsWithChildren, useEffect, useState } from
 import { AddEventListener, PCEventListener, RemoveEventListener } from "./event/events"
 import { useChopFileSummary } from "./util/fileSummary"
 import { getDirectory, useUserSettings } from "./util/userSettings"
-import { MdFolderOpen, MdOutlineKeyboard } from 'react-icons/md'
+import { MdFolderOpen, MdOutlineKeyboard, MdRefresh } from 'react-icons/md'
 import { BiBrush } from 'react-icons/bi'
-import { Tabs, Box, Divider, InputWrapper, Grid, ScrollArea, Select, Checkbox, Space, Chips, Chip, TextInput, createStyles, Center, Text } from '@mantine/core'
+import { Tabs, Box, Divider, InputWrapper, Grid, ScrollArea, Select, Checkbox, Space, Chips, Chip, TextInput, createStyles, Center, Text, Button } from '@mantine/core'
 import { useLocalStorage } from "./util/storage"
 import { HotkeyInput } from "./component/input/HotkeyInput"
 import { Hotkey } from "util/hotkeys"
@@ -44,7 +44,7 @@ export const Settings: FunctionComponent<Props> = (props) => {
         api.signalReady('settings')
     }, [])
 
-    const { loading, chopSummary } = useChopFileSummary()
+    const { loading, chopSummary, reloadFiles } = useChopFileSummary()
 
     const chopDirEnabled = !!userSettings.chopDir
     const srcDirEnabled = !!userSettings.srcDir
@@ -69,6 +69,21 @@ export const Settings: FunctionComponent<Props> = (props) => {
                 })} >
                     <Tabs.Tab label='Directory' icon={<MdFolderOpen size={ICON_SIZE} />}>
                         <SettingsContainer>
+                            <Button color="dark" leftIcon={<MdRefresh size='1.25em'/>} size='sm' compact
+                                variant='subtle'
+                                sx={(theme) => ({
+                                    position: 'absolute',
+                                    right: 0,
+                                    bottom: 0,
+                                    '&:hover': {
+                                        backgroundColor: theme.colors.bg2[0]
+                                    }
+                                })}
+                                onClick={() => reloadFiles()}
+                            >
+                                Reload
+                            </Button>
+
                             <Center sx={{height: '100%'}}>
                                 <Grid>
                                     <Grid.Col span={4}>
@@ -78,13 +93,11 @@ export const Settings: FunctionComponent<Props> = (props) => {
                                                 path={userSettings.srcDir}
                                                 onClick={() => setDirectory('src')}
                                             >
-                                                {chopSummary ? <>
-                                                    <Space h='xs' />
+                                                <Space h='xs' />
 
-                                                    <Text size='xs' weight="bold" align="center">
-                                                        {`Found ${chopSummary.numFiles} file(s)`}
-                                                    </Text>
-                                                </> : ''}
+                                                <Text size='xs' weight="bold" align="center">
+                                                    {!loading ? `Found ${chopSummary?.numFiles ?? 0} file(s)` : `Loading...`}
+                                                </Text>
                                             </DirectorySetter>
                                         </Center>
                                     </Grid.Col>
@@ -259,6 +272,7 @@ const SettingsContainer: FunctionComponent<PropsWithChildren<{}>> = ({children})
     height: '100%',
     width: '100%',
     boxSizing: 'border-box',
+    position: 'relative'
 
 }} p="sm">
     {children}

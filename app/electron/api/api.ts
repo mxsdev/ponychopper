@@ -3,7 +3,7 @@ import { ELECTRON_CONFIG } from "electron/config"
 import { IPCMainHandlers } from "electron/ipc/ipchandlers"
 import { IPCRendererInvoke, IPCRendererSend } from "electron/ipc/ipcrenderer"
 import { UserSettingsData } from "electron/main/settings"
-import { chop, prevChop, nextChop, filter, signalReady, beginDrag } from "./chop"
+import { chop, prevChop, nextChop, filter, signalReady, beginDrag, reloadFiles } from "./chop"
 
 export default {
     setPinned: (pinned: boolean) => {
@@ -21,5 +21,6 @@ export default {
     getDirectory: (...args: Parameters<IPCMainHandlers['get_folder']>) => IPCRendererInvoke('get_folder', ...args),
     
     chop, prevChop, nextChop,
-    filter, signalReady, beginDrag
+    filter, signalReady, beginDrag,
+    reloadFiles
 }

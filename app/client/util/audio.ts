@@ -2,6 +2,8 @@ import { AddEventListener, PCEventListener, RemoveEventListener } from "client/e
 import { ELECTRON_CONFIG } from "electron/config"
 import { useEffect, useState } from "react"
 
+export type AudioControls = ReturnType<typeof useWaveSurfer>['controls']
+
 export const useWaveSurfer = () => {
     const [ws, setWS] = useState<WaveSurfer|null>(null)
 
@@ -13,6 +15,8 @@ export const useWaveSurfer = () => {
         api.beginDrag()
     }
 
+    
+
     useEffect(() => {
         if(!ws) return
 
@@ -21,6 +25,12 @@ export const useWaveSurfer = () => {
         }
 
         AddEventListener('chop_buffer', bufferListener)
+
+        const playPauseListener: PCEventListener<'playback_toggle_play'> = () => ws?.playPause()
+        const restartListener: PCEventListener<'playback_restart'> = () => ws?.play(0)
+
+        AddEventListener('playback_toggle_play', playPauseListener)
+        AddEventListener('playback_restart', restartListener)
 
         const onEnd = () => setIsPlaying(false)
         const onStart = () => setIsPlaying(true)
@@ -31,6 +41,8 @@ export const useWaveSurfer = () => {
 
         return () => {
             RemoveEventListener('chop_buffer', bufferListener)
+            RemoveEventListener('playback_toggle_play', playPauseListener)
+            RemoveEventListener('playback_restart', restartListener)
 
             ws.un('play', onStart)
             ws.un('pause', onEnd)

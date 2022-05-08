@@ -14,6 +14,8 @@ import { WaveForm } from "./component/wave/WaveForm"
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'
 import { Hotkey, hotkeyToString, keyboardEventToHotkey, testKeyboardEvent } from "util/hotkeys"
 import { useHotkeyInput } from "./util/hotkeyInput"
+import { useUserSettings } from "./util/userSettings"
+import { useLocalHotkeys } from "./util/localHotkeys"
 
 // export default (global: boolean) => !global ? '⏯️ SPACE | 🔄 R | 🔪 C | ⬇️ Ctrl+D' : '🔄 Ctrl+Shift+R | 🔪 Ctrl+Shift+C'
 
@@ -63,6 +65,10 @@ export default ((props) => {
     const loading = chopLoading || filesLoading
 
     const { classes } = useStyles()
+
+    const { userSettings } = useUserSettings()
+
+    useLocalHotkeys(userSettings.localHotkeys, { chop, prev, next, controls })
 
     return (<>
         <DesktopMenuItems 
