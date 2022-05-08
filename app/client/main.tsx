@@ -6,13 +6,14 @@ import { isDesktop } from "util/desktop"
 import { compareSelections } from "util/selection"
 import { MainContainer } from "./component/MainContainer"
 import { Header } from "./component/Header"
-import { WaveSection } from "./component/wave/WaveSection"
 import { useSettings } from "./util/localSettings"
 import { useWaveSurfer } from "./util/audio"
 import { useChops } from "./util/chop"
 import { Grid, Box, Container, Paper, createStyles, Center, Button, AspectRatio, Space } from "@mantine/core"
 import { WaveForm } from "./component/wave/WaveForm"
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai'
+import { Hotkey, hotkeyToString, keyboardEventToHotkey, testKeyboardEvent } from "util/hotkeys"
+import { useHotkeyInput } from "./util/hotkeyInput"
 
 // export default (global: boolean) => !global ? '⏯️ SPACE | 🔄 R | 🔪 C | ⬇️ Ctrl+D' : '🔄 Ctrl+Shift+R | 🔪 Ctrl+Shift+C'
 
@@ -94,7 +95,7 @@ export default ((props) => {
                         px='lg'
 
                         draggable={true}
-                        onDragStart={() => console.log('drag start')}
+                        onDragStart={() => startDrag()}
                     >
                         <Center>
                             <WaveForm 
@@ -111,7 +112,7 @@ export default ((props) => {
                         <Grid gutter={4} sx={{ width: '100%' }} >
                             <Grid.Col span={12}>
                                 <AspectRatio ratio={1}>
-                                    <Button sx={(theme) => ({ fontSize: '2.5rem' })} px={0} onClick={() => chop()}>
+                                    <Button sx={(theme) => ({ fontSize: '2.5rem' })} px={0} onClick={() => chop()} disabled={!chopsEnabled} color='bg'>
                                         🔪
                                     </Button>
                                 </AspectRatio>
@@ -119,7 +120,7 @@ export default ((props) => {
 
                             <Grid.Col span={6}>
                                 <AspectRatio ratio={1}>
-                                    <Button px={0} onClick={() => prev()}>
+                                    <Button px={0} onClick={() => prev()} color='bg'>
                                         <AiOutlineLeft />
                                     </Button>
                                 </AspectRatio>
@@ -127,7 +128,7 @@ export default ((props) => {
 
                             <Grid.Col span={6}>
                                 <AspectRatio ratio={1} onClick={() => next()}>
-                                    <Button px={0}>
+                                    <Button px={0} color='bg'>
                                         <AiOutlineRight />
                                     </Button>
                                 </AspectRatio>
@@ -137,24 +138,5 @@ export default ((props) => {
                 </Grid.Col>
             </Grid>
         </Container>
-
-        {/* <MainContainer>
-            <div className="flex flex-col gap-8">
-                <Header />
-
-                <WaveSection 
-                    setWS={setWS}
-                    chopLoading={loading}
-                    
-                    onChop={chop}
-                    onNext={next}
-                    onPrev={prev}
-
-                    onDragStart={() => startDrag()}
-
-                    chopsEnabled={!!chopsEnabled}
-                />
-            </div>
-        </MainContainer> */}
     </>)
 }) as FunctionComponent<Props>

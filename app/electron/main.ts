@@ -17,6 +17,8 @@ export const userSettings = new UserSettingsManager('usersettings')
 app.whenReady().then(() => {
     windowManager.createMainWindow()
 
+    console.log(app.getPath('userData'))
+
     registerChopManager(ipcMain, windowManager, userSettings)
     userSettings.registerSettingsIPC(windowManager)
 })

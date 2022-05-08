@@ -26,7 +26,7 @@ function createWindow(opts: { width: number, height: number, minWidth?: number, 
 
     if(opts.mode === 'settings') {
         // win.setAlwaysOnTop(true, 'pop-up-menu')
-        win.setResizable(false)
+        // win.setResizable(false)
     }
 
     if(DEV_MODE) {

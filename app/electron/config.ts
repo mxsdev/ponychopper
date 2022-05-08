@@ -6,8 +6,8 @@ export const ELECTRON_CONFIG = {
             minWidth: 420
         },
         settings: {
-            width: 400,
-            height: 400
+            width: 600,
+            height: 300
         }
     },
 }
