@@ -13,7 +13,6 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
     manager.loadFiles(userSettings.get('srcDir'))
 
     IPCMainListen('filter', (event, filter) => {
-        if(!filter) return
         manager.filter(filter)
     })
 
@@ -43,6 +42,8 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
 
     IPCMainListen('ready', (event, from) => {
         IPCMainSend(event.sender, 'filesStatus', manager.getFileStatus())
+        IPCMainSend(event.sender, 'set_filter', manager.getFilter())
+        IPCMainSend(event.sender, 'filter_result', manager.getFilterResult())
     })
 
     manager.on('buffer', (buff) => {
@@ -55,6 +56,14 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
 
     manager.on('fileStatus', (status) => {
         windows.getAllWindows().forEach(win => IPCMainSend(win.webContents, 'filesStatus', status))
+    })
+
+    manager.on('setFilter', (filter) => {
+        IPCMainSend(windows.getMainWindow()?.webContents, 'set_filter', filter)
+    })
+
+    manager.on('filterResult', (result) => {
+        IPCMainSend(windows?.getMainWindow()?.webContents, 'filter_result', result)
     })
 
     userSettings.on('update', ({srcDir}, {srcDir: oldSrcDir}) => {

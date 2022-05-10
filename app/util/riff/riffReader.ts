@@ -12,7 +12,7 @@ import { WaveData } from "./types/data";
  * 
  */
  export interface BufferHandle {
-    read<T extends NodeJS.ArrayBufferView>(buffer: T, offset?: number | null, length?: number | null, position?: number | null): Promise<{bytesRead: number}>;
+    read(buffer: Buffer, offset?: number | null, length?: number | null, position?: number | null): Promise<{bytesRead: number}>;
 }
 
 class RIFFParseError extends Error {

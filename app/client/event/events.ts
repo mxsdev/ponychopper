@@ -1,5 +1,5 @@
-import { ChopFileStatus } from "chops/chopManager"
-import { ChopSelection } from "chops/chops"
+import { ChopFileStatus, FilterResult } from "chops/chopManager"
+import { ChopSelection, FilterOpts } from "chops/chops"
 import { UserSettingsData } from "electron/main/settings"
 
 type EventList<T extends { [channel: string]: Record<string, any> }> = T
@@ -21,7 +21,13 @@ export type WindowEvents = EventList<{
         update: Partial<UserSettingsData>
     },
     playback_toggle_play: { },
-    playback_restart: { }
+    playback_restart: { },
+    set_filter: {
+        filter: FilterOpts
+    },
+    filter_result: {
+        result: FilterResult
+    }
 }>
 
 export type PCEventListener<C extends keyof WindowEvents> = (event: CustomEvent<WindowEvents[C]>) => void

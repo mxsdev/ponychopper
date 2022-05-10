@@ -1,58 +1,33 @@
 import { assert } from "chai"
-import { regionUnion, regionContains, fragmentsToSpeech, ChopWord, ChopFragment, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer } from "../../app/chops/chops"
+import { regionUnion, regionContains, fragmentsToSpeech, ChopWord, ChopFragment, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopFile } from "../../app/chops/chops"
+import fs from 'fs'
+import path from 'path'
+import { getWaveMeta } from "../../app/util/riff"
 
-type TestFile = { words: ChopWord[], fragments: ChopFragment[] }
+// type TestFile = { words: ChopWord[], fragments: ChopFragment[] }
 
-const file_lov: TestFile = {
-    words: [],
-    fragments: [
-        { pos: { start: 34, length: 6 }, speech: 'l', syllables: 0, speakers: ['fs'] },
-        { pos: { start: 40, length: 12 }, speech: 'o', syllables: 1, speakers: ['fs'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 54, length: 4 }, speech: 'v', syllables: 0, speakers: ['fs'] },
-    ]
-}
+const smw_loc = path.join(__dirname, '../src/So Many Wonders.wav')
 
-const file_love: TestFile = {
-    words: [
-        { numFragments: 5, pos: { start: 15, length: 18 }, speech: 'people' },
-        { numFragments: 3, pos: { start: 30, length: 64 }, speech: 'love' },
-    ],
-    fragments: [
-        { pos: { start: 34, length: 6 }, speech: 'l', syllables: 0, speakers: ['fs'] },
-        { pos: { start: 40, length: 12 }, speech: 'lo', syllables: 1, speakers: ['fs'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 54, length: 4 }, speech: 've', syllables: 0, speakers: ['fs'] },
-    ]
-}
-
-const file_plelove: TestFile = {
-    words: [
-        { numFragments: 5, pos: { start: 15, length: 11 }, speech: 'people' },
-        { numFragments: 3, pos: { start: 30, length: 64 }, speech: 'love' },
-    ],
-    fragments: [
-        { pos: { start: 25, length: 4 }, speech: 'ple', syllables: 1, speakers: ['ts'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 34, length: 6 }, speech: 'l', syllables: 0, speakers: ['fs'] },
-        { pos: { start: 40, length: 12 }, speech: 'lo', syllables: 1, speakers: ['fs'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 54, length: 4 }, speech: 've', syllables: 0, speakers: ['fs'] },
-    ]
-}
-
-const file_peoplelove: TestFile = {
-    words: [
-        { numFragments: 3, pos: { start: 15, length: 11 }, speech: 'people' },
-        { numFragments: 3, pos: { start: 30, length: 64 }, speech: 'love' },
-    ],
-    fragments: [
-        { pos: { start: 16, length: 1 }, speech: 'p', syllables: 0, speakers: ['ts'] },
-        { pos: { start: 17, length: 9 }, speech: 'peo', syllables: 1, speakers: ['ts'], pitches: [ {class: 9, octave: 4} ] },
-        { pos: { start: 25, length: 4 }, speech: 'ple', syllables: 1, speakers: ['ts'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 34, length: 6 }, speech: 'l', syllables: 0, speakers: ['fs'] },
-        { pos: { start: 40, length: 12 }, speech: 'lo', syllables: 1, speakers: ['fs'], pitches: [ {class: 4, octave: 4} ] },
-        { pos: { start: 54, length: 4 }, speech: 've', syllables: 0, speakers: ['fs'] },
-    ]
-}
+let testFiles: ChopFile[] = [ ]
 
 describe('chops.ts', () => {
+    before(async () => {
+        const smw_buff = fs.readFileSync(smw_loc)
+
+        const smw_meta = await getWaveMeta({
+            read: async (buff, offset, length, pos) => {
+                const start = (offset ?? 0) + (pos ?? 0)
+                const end = start + (length ?? smw_buff.length)
+
+                const read = smw_buff.slice(start, end)
+                buff.set(read)
+                return { bytesRead: read.length }
+            }
+        }, smw_buff.length)
+
+        testFiles.push( waveMetaToChopFile(smw_meta, smw_loc) )
+    })
+
     // describe('waveMetaToChopFile', () => {
     //     it('test', async () => {
     //         const audio_dir = path.join(__dirname, '../../../ponychopper-audio/')
@@ -69,6 +44,22 @@ describe('chops.ts', () => {
 
     describe('fragment utilities', () => {
         describe('fragments to selection', () => {
+            const testRegion = (start: number, length: number) => fragmentsToSelection(0, testFiles[0], testFiles[0].chops.slice(start, start + length), testFiles[0].words, start, length)
+
+            it('test', () => {
+                const test = testRegion(5, 3)
+
+                assert.deepStrictEqual(
+                    test.word,
+                    { leftFull: true, rightFull: true, numWords: 1 }
+                )
+
+                assert.strictEqual(
+                    test.speech,
+                    'place'
+                )
+            })
+
             xit('works on testfile lov', () => {
                 // assert.deepStrictEqual(
                 //     fragmentsToSelection(1, file_lov.fragments, file_lov.words, 1, 2),
@@ -98,35 +89,35 @@ describe('chops.ts', () => {
             })
         })
 
-        describe('fragments to speech', () => {
-            it('works when no words', () => {
-                assert.strictEqual(
-                    fragmentsToSpeech(file_lov.fragments, file_lov.words).speech,
-                    'lov'
-                )
-            })
+        // describe('fragments to speech', () => {
+        //     it('works when no words', () => {
+        //         assert.strictEqual(
+        //             fragmentsToSpeech(file_lov.fragments, file_lov.words).speech,
+        //             'lov'
+        //         )
+        //     })
 
-            it('works with single word', () => {
-                assert.strictEqual(
-                    fragmentsToSpeech(file_love.fragments, file_love.words).speech,
-                    'love'
-                )
-            })
+        //     it('works with single word', () => {
+        //         assert.strictEqual(
+        //             fragmentsToSpeech(file_love.fragments, file_love.words).speech,
+        //             'love'
+        //         )
+        //     })
 
-            it('works with 1.5 words', () => {
-                assert.strictEqual(
-                    fragmentsToSpeech(file_plelove.fragments, file_plelove.words).speech,
-                    'plelove'
-                )
-            })
+        //     it('works with 1.5 words', () => {
+        //         assert.strictEqual(
+        //             fragmentsToSpeech(file_plelove.fragments, file_plelove.words).speech,
+        //             'plelove'
+        //         )
+        //     })
 
-            it('works with 2 words', () => {
-                assert.strictEqual(
-                    fragmentsToSpeech(file_peoplelove.fragments, file_peoplelove.words).speech,
-                    'peoplelove'
-                )
-            })
-        })
+        //     it('works with 2 words', () => {
+        //         assert.strictEqual(
+        //             fragmentsToSpeech(file_peoplelove.fragments, file_peoplelove.words).speech,
+        //             'peoplelove'
+        //         )
+        //     })
+        // })
     })
 
     describe('regionUnion', () => {

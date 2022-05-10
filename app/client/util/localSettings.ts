@@ -1,5 +1,6 @@
 import { AddEventListener, PCEventListener, RemoveEventListener } from "client/event/events"
 import { useEffect, useState } from "react"
+import { useEvent } from "./event"
 import { useLocalStorage } from "./storage"
 
 export const useSettings = () => {
@@ -10,22 +11,16 @@ export const useSettings = () => {
     const [ pinned, setPinned ] = useLocalStorage<boolean>('pinned', false)
 
     const [ settingsOpened, setSettingsOpened ] = useState<boolean>(false)
-
+    
     const toggleSettings = () => api.toggleSettings()
 
     useEffect(() => {
         api.setPinned(pinned)
     }, [pinned])
 
-    useEffect(() => {
-        const settingsListener: PCEventListener<'settings_window_status'> = ({detail: { opened }}) => {
-            setSettingsOpened(opened)
-        }
-
-        AddEventListener('settings_window_status', settingsListener)
-
-        return () => RemoveEventListener('settings_window_status', settingsListener)
-    }, [])
+    useEvent('settings_window_status', ({detail: { opened }}) => {
+        setSettingsOpened(opened)
+    })
     
     return {
         globalMode, setGlobalMode,

@@ -1,4 +1,4 @@
-import { ChopFileStatus } from "chops/chopManager"
+import { ChopFileStatus, FilterResult } from "chops/chopManager"
 import { ChopSelection, FilterOpts } from "chops/chops"
 import { UserSettingsData } from "electron/main/settings"
 import { WindowType } from "electron/main/windows"
@@ -37,5 +37,8 @@ export type IPCMainEvents = EventList<{
     update_settings: [ settings: Partial<UserSettingsData> ]
 
     playback_toggle_play: [],
-    playback_restart: []
+    playback_restart: [],
+
+    set_filter: [ opts: FilterOpts ],
+    filter_result: [ result: FilterResult ]
 }>

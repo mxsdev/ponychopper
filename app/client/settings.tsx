@@ -167,15 +167,7 @@ export const Settings: FunctionComponent<Props> = (props) => {
                         <SettingsContainer>
                             <Divider mb="xs" labelPosition="right" label="Title Gradient" />
                             
-                            <Chips styles={ (theme) => ({ 
-                                    label: { 
-                                        background: `${theme.colors.bg2[0]} !important`,
-                                        ':not(input:checked+&)': {
-                                            borderColor: `rgba(1, 1, 1, 0)`
-                                        }
-                                    },
-                                    
-                                }) } size='xs'>
+                            <Chips size='xs'>
                                 <Chip value='rainbow'>Rainbow</Chip>
                                 <Chip value='trans'>Trans</Chip>
                                 <Chip value='bisexual'>Bisexual</Chip>

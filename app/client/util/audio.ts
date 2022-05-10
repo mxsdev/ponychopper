@@ -15,8 +15,6 @@ export const useWaveSurfer = () => {
         api.beginDrag()
     }
 
-    
-
     useEffect(() => {
         if(!ws) return
 

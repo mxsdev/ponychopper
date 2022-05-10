@@ -1,5 +1,5 @@
 import { ChopFileManager, ChopFileStatus } from 'chops/chopManager';
-import { ChopSelection } from 'chops/chops';
+import { ChopSelection, FilterOpts } from 'chops/chops';
 import { DispatchEvent } from 'client/event/events';
 import { ipcRenderer } from 'electron';
 import { ELECTRON_CONFIG } from 'electron/config';

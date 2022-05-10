@@ -1,6 +1,7 @@
 import { PCEventListener, AddEventListener, RemoveEventListener } from "client/event/events"
 import { UserSettingsData } from "electron/main/settings"
 import { useState, useEffect } from "react"
+import { useEvent } from "./event"
 
 export const useUserSettings = () => {
     const [ userSettings, _setUserSettings ] = useState<UserSettingsData>({
@@ -11,20 +12,12 @@ export const useUserSettings = () => {
     })
 
     // listen for settings changes
-    useEffect(() => {
-        const settingsListener: PCEventListener<'update_settings'> = ({ detail: { update } }) => {
-            _setUserSettings((val) => ({
-                ...val,
-                ...update
-            }))
-        }
-
-        AddEventListener('update_settings', settingsListener)
-
-        return () => {
-            RemoveEventListener('update_settings', settingsListener)
-        }
-    }, [])
+    useEvent('update_settings', ({ detail: { update } }) => {
+        _setUserSettings((val) => ({
+            ...val,
+            ...update
+        }))
+    })
 
     const updateSettings = (update: Partial<UserSettingsData>) => {
         api.updateSettings(update)

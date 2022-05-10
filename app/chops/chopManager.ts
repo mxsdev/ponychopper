@@ -10,6 +10,7 @@ import EventEmitter from 'events'
 import TypedEmitter from "typed-emitter"
 import { TypedEmitterInstance } from 'util/emitter'
 import shortid from 'short-uuid'
+import { defaultFilter } from './filter'
 
 export async function createChopFileManager(fileDir: PathLike) {
     const manager = new ChopFileManager()
@@ -24,10 +25,16 @@ export type ChopFileStatus = {
     summary?: ChopFileSummary
 }
 
+export type FilterResult = {
+    amount: number
+}
+
 type ChopFileManagerMessages = {
     'select': (selection: ChopSelection|null) => void,
     'buffer': (buffer: Buffer) => void,
-    'fileStatus': (status: ChopFileStatus) => void
+    'fileStatus': (status: ChopFileStatus) => void,
+    'setFilter': (filterOpts: FilterOpts) => void,
+    'filterResult': (filterResult: FilterResult) => void
 }
 
 export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopFileManagerMessages>) {
@@ -85,9 +92,9 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         this.empty()
         this.selector = createChopSelector(this.files)
 
-        this.filter(this.filterOpts)
-
         const summary = this.fileSummary()
+
+        this.filter(defaultFilter(summary))
 
         this.setFileStatus({ loading: false, summary })
 
@@ -109,11 +116,28 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
 
     filter(opts: FilterOpts) {
         this.filterOpts = opts
+        this.emit('setFilter', opts)
 
-        if(!this.selector) return 0
-        this.selectionList = this.selector(opts)
+        let numSelected = 0
 
-        return this.selectionList.length
+        if(this.selector) {
+            this.selectionList = this.selector(opts)
+            numSelected = this.selectionList.length
+        }
+
+        this.emit('filterResult', { amount: numSelected })
+
+        return numSelected
+    }
+
+    getFilterResult(): FilterResult {
+        return {
+            amount: this.selectionList.length
+        }
+    }
+
+    getFilter(): FilterOpts {
+        return this.filterOpts
     }
 
     current(): ChopSelection|undefined {
@@ -173,8 +197,8 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         return this.selectionList.length
     }
 
-    chop(): ChopSelection {
-        if(this.selectionList.length === 0) throw new Error('No chops available!')
+    chop(): ChopSelection|null {
+        if(this.selectionList.length === 0) return null
 
         const sel = arrayRandom(this.selectionList)
         this.selection.push(sel)

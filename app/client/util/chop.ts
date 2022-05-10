@@ -6,20 +6,9 @@ import { useEffect, useState } from "react"
 export const useChops = () => {
     const { loading, chopSummary, chopsEnabled } = useChopFileSummary()
 
-    const [ filter, _setFilter ] = useState<FilterOpts>({ syllables: { lte: 3, gte: 1 } })
-
-    const updateFilter = (opts: Partial<FilterOpts>) => {
-        _setFilter({ ...filter, ...opts })
-    }
-
     useEffect(() => {
         api.signalReady('main')
     }, [])
-
-    useEffect(() => {
-        if(loading) return
-        api.filter(filter)
-    }, [filter, loading])
 
     const chop = () => {
         if(!chopsEnabled) {
@@ -36,9 +25,8 @@ export const useChops = () => {
     return {
         loading,
         chopsEnabled,
+        chopSummary,
         
-        updateFilter, filter,
-
         chop,
         prev,
         next

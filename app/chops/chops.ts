@@ -2,6 +2,10 @@ import { getContiguousSubarrays } from './../util/arrays';
 import { getWaveSampleRange, WaveMeta, WaveWriter } from "../util/riff"
 import fs from 'fs/promises'
 import type { PathLike } from 'fs'
+import { fileBaseNameNoExt } from 'util/path';
+import { range } from 'util/range';
+import { NumericComparison } from 'util/types/numeric';
+import Fuse from 'fuse.js'
 
 export type ChopPosIndex = number
 
@@ -26,9 +30,15 @@ export type ChopFragment = {
     speech: string,
     syllables: number,
     pos: ChopPosRegion,
-    pitches?: ChopPitch[],
-    speakers?: string[]
+    pitches: ChopPitch[],
+    speakers: ChopSpeaker[]
 }
+
+export type ChopSpeaker = string
+
+type ChopSpeakerList = (ChopSpeaker|undefined)[]
+
+type ChopPitchList = (ChopPitch|undefined)[]
 
 export type ChopFile = {
     /**
@@ -66,11 +76,13 @@ export type ChopFile = {
 
 export type ChopSelection = {
     fileIndex: number,
+    chopFile: ChopFile,
+    
     pos: ChopPosRegion,
     speech: string,
 
-    pitches: ChopPitch[],
-    speakers: string[],
+    pitches: ChopPitchList,
+    speakers: ChopSpeakerList,
     syllables: number,
 
     word: {
@@ -78,10 +90,11 @@ export type ChopSelection = {
         leftFull: boolean, rightFull: boolean,
     },
 
-    phrase: {
-        numPhrases: number,
-        leftFull: boolean, rightFull: boolean
-    },
+    // TODO: implement phrase selection
+    // phrase: {
+    //     numPhrases: number,
+    //     leftFull: boolean, rightFull: boolean
+    // },
 
     fragmentIndex: number,
     fragmentLength: number,
@@ -103,19 +116,29 @@ export const regionUnion = (...regions: ChopPosRegion[]): ChopPosRegion => {
     return { start, length }
 }
 
+const fileBaseName = (file: ChopFile): string => fileBaseNameNoExt(file.location.toString())
+
 const serializePitch = (pitch: ChopPitch): string => `${pitch.class},${pitch.octave}`
 
 export type ChopFileSummary = {
-    speakers: string[],
+    speakers: ChopSpeakerList,
     numChopFragments: number,
-    numFiles: number
+    numFiles: number,
+    fileNames: string[],
+    meta: {
+        seasons: (ChopFile['meta']['season'])[]
+    }
 }
 
 export function chopFileSummary(files: ChopFile[]): ChopFileSummary {
     return ({
         numFiles: files.length,
         numChopFragments: files.reduce((prev, curr) => prev + curr.chops.length, 0),
-        speakers: [...new Set<string>(files.flatMap(f => f.chops.flatMap(f => f.speakers ?? [])))]
+        speakers: [...new Set<string|undefined>(files.flatMap(f => f.chops.flatMap(f => f.speakers)))],
+        fileNames: files.map(file => fileBaseName(file)),
+        meta: {
+            seasons: files.map(file => file.meta.season)
+        }
     })
 }
 
@@ -147,7 +170,9 @@ export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]):
 
                 if(i === 0) {
                     leftFull = true
-                }else if(i + j === fragments.length) {
+                }
+                
+                if(i + j === fragments.length) {
                     rightFull = true
                 }
             } else {
@@ -165,34 +190,50 @@ export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]):
     return { speech, word: { leftFull, rightFull, numWords }}
 }
 
-export const fragmentsToSelection = (fileIndex: number, fragments: ChopFragment[], words: ChopWord[], fragmentIndex: number, fragmentLength: number): ChopSelection => {
+export const fragmentsToSelection = (fileIndex: number, chopFile: ChopFile, fragments: ChopFragment[], words: ChopWord[], fragmentIndex: number, fragmentLength: number): ChopSelection => {
     // get pitch list without duplicates
-    const pitches: ChopPitch[] = []
+    const pitches: ChopPitchList = []
     const seenPitches: Record<string, boolean> = { }
+    let includesUndefined = false
 
-    fragments.flatMap(f => f.pitches ?? []).forEach(p => {
-        const sp = serializePitch(p)
-        if(seenPitches[sp]) return
+    fragments.forEach(f => {
+        const pitchList = f.pitches.length > 0 ? f.pitches : [undefined]
 
-        pitches.push(p)
-        seenPitches[sp] = true
+        pitchList.forEach(p => {
+            if(p === undefined) {
+                if(!includesUndefined && f.syllables > 0) {
+                    pitches.push(undefined)
+                    includesUndefined = true
+                }
+    
+                return
+            }
+    
+            const sp = serializePitch(p)
+            if(seenPitches[sp]) return
+    
+            pitches.push(p)
+            seenPitches[sp] = true
+        })
     })
 
     const { speech, word } = fragmentsToSpeech(fragments, words)
 
     return ({
         fileIndex,
+        chopFile,
+
         pos: regionUnion(...fragments.map(f => f.pos)),
         speech,
 
         pitches,
-        speakers: [...new Set<string>( fragments.flatMap(f => f.speakers ?? []) )],
+        speakers: [...new Set<ChopSpeaker|undefined>( fragments.flatMap(f => f.speakers.length > 0 ? f.speakers : undefined) )],
         syllables: fragments.reduce((prev, curr) => prev + curr.syllables, 0),
 
         fragmentIndex, fragmentLength,
 
         word,
-        phrase: { numPhrases: 0, leftFull: false, rightFull: false }
+        // phrase: { numPhrases: 0, leftFull: false, rightFull: false }
     })
 }
 
@@ -258,14 +299,14 @@ type CueType = (
     }
     |{
         type: 'speaker',
-        speakers: string[],
+        speakers: ChopSpeaker[],
         pos: ChopPosRegion
     }
     |{
         type: 'chop',
         speech: string,
         syllables: number,
-        pitches?: ChopPitch[]
+        pitches: ChopPitch[]
         pos: ChopPosRegion,
     }
 )
@@ -362,7 +403,7 @@ function getCueType(region: WaveRegion): CueType|null {
         const syllables = isNaN(syll_arg) ? 1 : syll_arg
 
         const pitch_arg: string|undefined = kwargs['p'] || kwargs['pitch']
-        const pitches = pitch_arg ? parsePitchArg(pitch_arg) : undefined
+        const pitches = pitch_arg ? parsePitchArg(pitch_arg) : []
 
         return {
             type: 'chop',
@@ -471,6 +512,7 @@ function getAllChopSelections(file: ChopFile, fileIndex: number): ChopSelection[
                 res.push(
                     fragmentsToSelection(
                         fileIndex,
+                        file,
                         chunk.slice(x, y+1),
                         file.words,
                         x+k, y+k
@@ -502,11 +544,135 @@ function getAllChopSelections(file: ChopFile, fileIndex: number): ChopSelection[
     return res
 }
 
+type FilterSearch = {
+    query?: string,
+    type?: 'fuzzy'|'exact'|'regex'
+}
+
 export type FilterOpts = {
-    syllables?: { 
-        gte?: number,
-        lte?: number
+    syllables?: NumericComparison,
+    speaker?: {
+        in: ChopSpeakerList,
+        nonstrict?: boolean
+    },
+    pitch?: {
+        classes?: (number|undefined)[],
+        octaves?: NumericComparison,
+        nonstrict?: boolean,
+        pm?: number
+    },
+    meta?: {
+        season?: (ChopFile['meta']['season']|undefined)[]
+    },
+    sentence?: {
+        word?: boolean,
+        // phrase?: boolean,
+        other?: boolean,
+        numWords?: NumericComparison,
+        // numPhrases?: NumericComparison
+    },
+    file?: string[],
+    search?: FilterSearch
+}
+
+function compareObj(a: number, obj: NumericComparison = { }) {
+    const { gte, lte, eq } = obj
+
+    if(gte != null && !(a >= gte - Number.EPSILON)) return false
+    if(lte != null && !(a <= lte + Number.EPSILON)) return false
+    if(eq != null  && !(Math.abs(a - eq) < Number.EPSILON)) return false
+
+    return true
+}
+
+function pitchToNumber(pitch: ChopPitch): number {
+    return pitch.octave*12 + (pitch.class - 1)
+}
+
+function numericComparisonToRange(obj: NumericComparison): number[] {
+    if(obj.eq != null) return [ Math.round(obj.eq) ]
+
+    if(obj.gte != null && obj.lte != null) return range(obj.gte, obj.lte + 1)
+
+    return [ ]
+}
+
+function searchChops(selections: ChopSelection[], query: string = '', type: FilterSearch['type'] = 'fuzzy'): ChopSelection[] {
+    if(!query) return selections
+
+    switch(type) {
+        case 'fuzzy':
+            return new Fuse(selections, { keys: [ 'speech' ]}).search(query).map(r => r.item)
+        case 'regex':
+            try {
+                const regex = new RegExp(query)
+                return selections.filter(({speech}) => regex.test(speech))
+            }catch(e) {
+                // invalid regex
+                return selections
+            } 
+        case 'exact':
+            return selections.filter(({speech}) => speech === query)
     }
+}
+
+function filterChops(selections: ChopSelection[], opts: FilterOpts): ChopSelection[] {
+    // pitch
+    const pitch_in: ChopPitchList = (opts.pitch?.classes ?? []).flatMap((cl) => {
+        if(cl == null) return [undefined]
+
+        const oc_range = (opts.pitch?.octaves ? numericComparisonToRange(opts.pitch.octaves) : [])
+
+        return oc_range.map((oc) => ({ class: cl, octave: oc }))
+    })
+
+    // search
+    const searchRes = searchChops(selections, opts.search?.query, opts.search?.type)
+
+    return selections
+        // syllables
+        .filter((sel) => compareObj(sel.syllables, opts.syllables))
+        // speaker
+        .filter((sel) => {
+            const compare = (s: ChopSpeaker|undefined) => opts.speaker?.in.includes(s)
+
+            return !opts.speaker?.nonstrict ? 
+                sel.speakers.every(compare) :
+                sel.speakers.some(compare)
+        })
+        // pitch
+        .filter((sel) => {
+            const compare = (pitch: ChopPitch|undefined) => {
+                if(pitch === undefined) return pitch_in.includes(undefined)
+
+                return pitch_in.some((p) => p && Math.abs(pitchToNumber(p) - pitchToNumber(pitch)) <= (opts.pitch?.pm ?? 0) + Number.EPSILON)
+            }
+
+            return !opts.pitch?.nonstrict ?
+                sel.pitches.every(compare) :
+                sel.pitches.some(compare)
+        })
+        // sentence
+            .filter((sel) => compareObj(sel.word.numWords, opts.sentence?.numWords))
+            .filter((sel) => {
+                const isWordSet = sel.word.leftFull && sel.word.rightFull
+                const isOther = !isWordSet
+
+                if(isWordSet && opts.sentence?.word === false) return false
+                if(isOther && opts.sentence?.other === false) return false
+
+                return true
+            })
+        // meta
+        .filter((sel) => {
+            return opts.meta?.season?.includes(sel.chopFile.meta.season)
+        })
+        // file
+        .filter((sel) => {
+            return (opts?.file ?? []).includes(fileBaseName(sel.chopFile))
+        })
+        // search
+        .filter((sel) => searchRes.includes(sel))
 }
 
 export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
@@ -514,16 +680,5 @@ export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
 export function createChopSelector(files: ChopFile[]): ChopSelector {
     const selections: ChopSelection[] = files.flatMap((file, i) => getAllChopSelections(file, i))
 
-    return ((opts) => {
-        return selections
-            .filter((sel) => {
-                const gte = opts.syllables?.gte
-                const lte = opts.syllables?.lte
-
-                if(gte != null && !(sel.syllables >= gte)) return false
-                if(lte != null && !(sel.syllables <= lte)) return false
-
-                return true
-            })
-    })
+    return ((opts) => filterChops(selections, opts))
 }

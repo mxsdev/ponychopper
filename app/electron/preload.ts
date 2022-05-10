@@ -20,3 +20,11 @@ IPCRendererListen('playback_toggle_play', (ev) => {
 IPCRendererListen('playback_restart', (ev) => {
     DispatchEvent('playback_restart', { })
 })
+
+IPCRendererListen('set_filter', (ev, opts) => {
+    DispatchEvent('set_filter', { filter: opts })
+})
+
+IPCRendererListen('filter_result', (ev, res) => {
+    DispatchEvent('filter_result', { result: res })
+})

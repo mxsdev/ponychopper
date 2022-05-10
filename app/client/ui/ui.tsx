@@ -81,6 +81,17 @@ export const wrapUIProvider = (node: React.ReactNode) => (
                     // }
 
                 })
+            },
+            Chips: {
+                styles: (theme: any) => ({ 
+                    label: { 
+                        background: `${theme.colors.bg2[0]} !important`,
+                        ':not(input:checked+&)': {
+                            borderColor: `rgba(1, 1, 1, 0)`
+                        }
+                    },
+                    
+                })
             }
         }}
     >
