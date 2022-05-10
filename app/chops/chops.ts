@@ -1,4 +1,4 @@
-import { getContiguousSubarrays } from './../util/arrays';
+import { getContiguousSubarrays, shuffle } from './../util/arrays';
 import { getWaveSampleRange, WaveMeta, WaveWriter } from "../util/riff"
 import fs from 'fs/promises'
 import type { PathLike } from 'fs'
@@ -675,10 +675,45 @@ function filterChops(selections: ChopSelection[], opts: FilterOpts): ChopSelecti
         .filter((sel) => searchRes.includes(sel))
 }
 
-export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
+export class ChopSelector {
+    private selections: ChopSelection[]
 
-export function createChopSelector(files: ChopFile[]): ChopSelector {
+    private currIndex = 0
+
+    constructor(selections: ChopSelection[]) {
+        this.selections = selections
+        this.shuffleSelections()
+    }
+
+    select(): ChopSelection|undefined {
+        if(this.selections.length === 0) return undefined
+
+        const res = this.selections[this.currIndex]
+
+        this.incr()
+
+        return res
+    }
+
+    getSelections() {
+        return this.selections
+    }
+
+    private shuffleSelections() {
+        shuffle(this.selections)
+    }
+
+    private incr() {
+        this.currIndex = (this.currIndex + 1) % this.selections.length
+    }
+}
+
+export type ChopSelectorGenerator = (opts: FilterOpts) => ChopSelector
+
+// export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
+
+export function createChopSelectorGenerator(files: ChopFile[]): ChopSelectorGenerator {
     const selections: ChopSelection[] = files.flatMap((file, i) => getAllChopSelections(file, i))
 
-    return ((opts) => filterChops(selections, opts))
+    return ((opts) => new ChopSelector(filterChops(selections, opts)))
 }

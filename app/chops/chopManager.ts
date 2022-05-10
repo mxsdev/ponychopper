@@ -3,7 +3,7 @@ import { getWaveMeta, WaveMeta } from '../util/riff'
 import { exists, getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
-import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer, ChopSelector, createChopSelector, FilterOpts, chopFileSummary, ChopFileSummary } from './chops'
+import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator } from './chops'
 import path from 'path'
 import fs from 'fs'
 import EventEmitter from 'events'
@@ -44,9 +44,11 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
 
     private status: ChopFileStatus = { loading: false }
 
+    private selectorGenerator: ChopSelectorGenerator|null = null
     private selector: ChopSelector|null = null
+
     private filterOpts: FilterOpts = { }
-    private selectionList: ChopSelection[] = [ ]
+    // private selectionList: ChopSelection[] = [ ]
 
     private uuid = shortid()
 
@@ -90,7 +92,7 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         }))
 
         this.empty()
-        this.selector = createChopSelector(this.files)
+        this.selectorGenerator = createChopSelectorGenerator(this.files)
 
         const summary = this.fileSummary()
 
@@ -120,9 +122,9 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
 
         let numSelected = 0
 
-        if(this.selector) {
-            this.selectionList = this.selector(opts)
-            numSelected = this.selectionList.length
+        if(this.selectorGenerator) {
+            this.selector = this.selectorGenerator(opts)
+            numSelected = this.getFilterResult().amount
         }
 
         this.emit('filterResult', { amount: numSelected })
@@ -130,14 +132,16 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         return numSelected
     }
 
-    getFilterResult(): FilterResult {
-        return {
-            amount: this.selectionList.length
-        }
+    getSelectionList(): ChopSelection[] {
+        return this.selector?.getSelections() ?? []
     }
 
     getFilter(): FilterOpts {
         return this.filterOpts
+    }
+
+    getFilterResult(): FilterResult {
+        return { amount: this.numSelections() }
     }
 
     current(): ChopSelection|undefined {
@@ -194,16 +198,15 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
     }
 
     numSelections() {
-        return this.selectionList.length
+        return this.getSelectionList().length
     }
 
     chop(): ChopSelection|null {
-        if(this.selectionList.length === 0) return null
+        const sel = this.selector?.select()
 
-        const sel = arrayRandom(this.selectionList)
-        this.selection.push(sel)
+        if(sel) this.selection.push(sel)
 
-        return sel
+        return sel ?? null
     }
 
     prev() {
