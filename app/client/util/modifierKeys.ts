@@ -23,7 +23,7 @@ export const useModifierKeys = () => {
     }, [ os, setCtrlKey ])
 
     return {
-        ctrlKey,
-        altKey
+        modMain: ctrlKey,
+        modAlt: altKey
     }
 }

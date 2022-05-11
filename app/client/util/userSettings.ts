@@ -1,6 +1,7 @@
 import { PCEventListener, AddEventListener, RemoveEventListener } from "client/event/events"
 import { UserSettingsData } from "electron/main/settings"
 import { useState, useEffect } from "react"
+import { Hotkey, HotkeyId } from "util/hotkeys"
 import { useEvent } from "./event"
 
 export const useUserSettings = () => {
@@ -37,7 +38,23 @@ export const useUserSettings = () => {
             if(type === 'chop') updateSettings({chopDir: path})
         })
 
-    return { userSettings, updateSettings, setDirectory }
+    const setHotkey = (type: 'global'|'local', id: HotkeyId, hk?: Hotkey) => {
+        const key = (() => {
+            switch(type) {
+                case 'global':
+                    return 'globalHotkeys'
+                case 'local':
+                    return 'localHotkeys'
+            }
+        })()
+
+        updateSettings({ [ key ]: {
+            ...userSettings[key],
+            [id]: hk
+        } })
+    }
+
+    return { userSettings, updateSettings, setDirectory, setHotkey }
 }
 
 export const getDirectory = async (...args: Parameters<typeof api.getDirectory>) => api.getDirectory(...args).then(({canceled, filePaths}) => {

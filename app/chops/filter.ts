@@ -13,7 +13,7 @@ export function defaultFilter(summary: ChopFileSummary): FilterOpts {
             pm: 0
         },
         sentence: {
-            numWords: { gte: 1, lte: 3 },
+            numWords: { eq: 1 },
             other: true,
             word: true
         },

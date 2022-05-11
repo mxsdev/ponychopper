@@ -3,6 +3,7 @@ import React, { ComponentProps, FunctionComponent } from "react"
 import { Hotkey } from "util/hotkeys"
 import { InputProps, Input, ActionIcon } from "@mantine/core"
 import { MdClear } from 'react-icons/md'
+import { ClearButton } from "./ClearButton"
 
 type Props = {
     disabled?: boolean,
@@ -26,9 +27,7 @@ export const HotkeyInput: FunctionComponent<Props> = ({ hotkey, setHotkey, disab
             placeholder={placeholder}
 
             rightSection={
-                hotkey ? <ActionIcon variant='transparent' onClick={() => setHotkey?.(undefined)}>
-                    <MdClear size={'1em'} />
-                </ActionIcon> : undefined
+                hotkey ? <ClearButton onClick={() => setHotkey?.(undefined)} /> : undefined
             }
 
             onBlur={reset}

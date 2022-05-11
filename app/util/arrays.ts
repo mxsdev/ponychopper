@@ -30,3 +30,10 @@ export function shuffle<T>(array: T[]) {
         array[randomIndex], array[currentIndex]];
     }
   }
+
+export function includeElement<T>(arr: T[], el: T, include: boolean): T[] {
+  return [
+    ...arr.filter(x => x !== el),
+    ...(include ? [ el ] : [])
+  ]
+}

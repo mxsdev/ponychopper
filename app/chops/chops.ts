@@ -710,8 +710,6 @@ export class ChopSelector {
 
 export type ChopSelectorGenerator = (opts: FilterOpts) => ChopSelector
 
-// export type ChopSelector = (opts: FilterOpts) => ChopSelection[]
-
 export function createChopSelectorGenerator(files: ChopFile[]): ChopSelectorGenerator {
     const selections: ChopSelection[] = files.flatMap((file, i) => getAllChopSelections(file, i))
 
