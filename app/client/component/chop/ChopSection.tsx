@@ -1,4 +1,4 @@
-import { Grid, Center } from "@mantine/core"
+import { Grid, Center, Container } from "@mantine/core"
 import React, { FunctionComponent } from "react"
 import type WaveSurfer from 'wavesurfer.js'
 import { WaveFormControls } from "./WaveFormControls"
@@ -16,6 +16,7 @@ type Props = {
 
 export const ChopSection: FunctionComponent<Props> = ({ chopLoading, setWS, startDrag, chop, next, prev, chopsAvailable }) => {
     return (<>
+    <Container size={350} px='xl' >
         <Grid sx={{height: '170px'}}>
                 <Grid.Col span={9} sx={{ height: '100%' }}>
                     <WaveFormPanel 
@@ -36,5 +37,6 @@ export const ChopSection: FunctionComponent<Props> = ({ chopLoading, setWS, star
                     </Center>
                 </Grid.Col>
             </Grid>
+        </Container>
     </>)
 }

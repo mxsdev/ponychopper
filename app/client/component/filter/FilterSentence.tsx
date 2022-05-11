@@ -16,7 +16,7 @@ type Props = {
 export const FilterSentence: FunctionComponent<Props> = ({ word, other, numWords, updateSentence }) => {
     return (<>
         <FilterSection header="Sentence">
-        <SimpleGrid cols={6}>
+        <SimpleGrid cols={5}>
             <Checkbox size='xs' label='Words' 
                 checked={word} 
                 onChange={({ target: { checked } }) => updateSentence({ word: checked })}

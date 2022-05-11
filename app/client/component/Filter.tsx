@@ -1,5 +1,6 @@
 import { Container } from "@mantine/core"
 import { ChopFileSummary, FilterOpts } from "chops/chops"
+import { useModifierKeys } from "client/util/modifierKeys"
 import React, { FunctionComponent } from "react"
 import { FilterContainer } from "./filter/FilterContainer"
 import { FilterFile } from "./filter/FilterFile"
@@ -18,36 +19,19 @@ type Props = {
 }
 
 export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSummary, loading }) => {
+    const { modMain, modAlt } = useModifierKeys()
+
     if(loading || !chopSummary) return <></>
 
     return (<>
         <FilterContainer>
-            {/* Search */}
-            <FilterSearch 
-                query={filter?.search?.query ?? ''}
-                type={filter?.search?.type ?? 'fuzzy'}
-                updateSearch={(d) => updateFilter('search', d)}
-            />
-
-            {/* Syllables */}
-            <FilterSyllables 
-                syllables={filter.syllables}
-                updateSyllables={(d, local) => updateFilter('syllables', d, local)}
-            />
-
-            {/* Speaker */}
-            <FilterSpeaker 
-                speakers={filter.speaker?.in ?? []}
-                speakerList={chopSummary.speakers}
-                updateSpeakers={(d, local) => updateFilter('speaker', d, local)}
-            />
-
             {/* Pitch */}
             <FilterPitch 
                 classes={filter.pitch?.classes ?? []}
                 nonstrict={!!filter.pitch?.nonstrict}
                 octaves={filter.pitch?.octaves}
                 updatePitch={(d, local) => updateFilter('pitch', d, local)}
+                soloMode={modMain}
             />
 
             {/* Sentence */}
@@ -57,12 +41,32 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
                 numWords={filter.sentence?.numWords}
                 updateSentence={(d, local) => updateFilter('sentence', d, local)}
             />
+
+            {/* Syllables */}
+            <FilterSyllables 
+                syllables={filter.syllables?.numSyllables}
+                updateSyllables={(d, local) => updateFilter('syllables', d, local)}
+            />
+
+            {/* Speaker */}
+            <FilterSpeaker 
+                speakers={filter.speaker?.in ?? []}
+                speakerList={chopSummary.speakers}
+                updateSpeakers={(d, local) => updateFilter('speaker', d, local)}
+            />
             
             {/* Meta */}
             <FilterMeta
                 season={filter.meta?.season ?? []}
                 seasonList={chopSummary.meta.seasons}
                 updateMeta={(d, local) => updateFilter('meta', d, local)}
+            />
+
+            {/* Search */}
+            <FilterSearch 
+                query={filter?.search?.query ?? ''}
+                type={filter?.search?.type ?? 'fuzzy'}
+                updateSearch={(d) => updateFilter('search', d)}
             />
 
             {/* File */}

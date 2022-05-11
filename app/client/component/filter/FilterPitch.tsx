@@ -13,18 +13,17 @@ type Props = {
     classes: (number|undefined)[],
     octaves: NumericComparison|undefined,
     updatePitch: FilterUpdate<'pitch'>,
-    nonstrict: boolean
+    nonstrict: boolean,
+    soloMode: boolean
 }
 
 const PitchKeyValues = PitchKeys.map((_, i) => i+1)
 
-export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, updatePitch, nonstrict }) => {
-    const { modMain, modAlt } = useModifierKeys()
-
+export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, updatePitch, nonstrict, soloMode }) => {
     const updateClasses = (checked: boolean, key: number|undefined) => {
         const otherChecked = classes.filter(x => x != null && x !== key).length > 0
 
-        if(modMain) {
+        if(soloMode) {
             if(otherChecked) {
                 updatePitch({ classes: [ key ] })
             } else {
@@ -46,7 +45,7 @@ export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, update
                     const key = i+1
 
                     return (
-                    <Grid.Col span={2} key={keyName}>
+                    <Grid.Col span={3} key={keyName}>
                         <Checkbox 
                             label={keyName} 
                             size='xs' 

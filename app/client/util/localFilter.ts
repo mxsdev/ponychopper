@@ -16,24 +16,6 @@ export const useFilter = () => {
 
     const chopsAvailable = filterResult?.amount > 0
 
-    // const _updateFilter = useCallback((update: UpdateStateArgument<Partial<FilterOpts>>, localOnly: boolean = false) => {
-
-    //     const new_filter = {
-    //         ...filter,
-    //         ...update
-    //     }
-
-    //     // optimistic update
-    //     setFilter((_f) => ({
-    //         ..._f,
-    //         ...update
-    //     }))
-
-    //     console.log(new_filter)
-            
-    //     if(!localOnly) api.filter(new_filter)
-    // }, [ filter ])
-
     useEvent('set_filter', ({ detail: { filter: update } }) => {
         setFilter(update)
     })
@@ -52,26 +34,17 @@ export const useFilter = () => {
             }
         }
 
-        const new_filter = {
-            ...f,
-            ...update
-        }
-
         // optimistic update
         setFilter((_f) => ({
             ..._f,
             ...update
         }))
-        
-        if(!localOnly) api.filter(new_filter)
-    }
 
-    // useEffect(() => {
-    //     console.log({
-    //         from: 'useEffect',
-    //         filter
-    //     })
-    // }, [ filter ])
+        if(!localOnly) api.filter({
+            ...f,
+            ...update
+        })
+    }
 
     useEffect(() => {
         latestFilter.current = filter
@@ -83,3 +56,5 @@ export const useFilter = () => {
         chopsAvailable
     }
 }
+
+export type FilterUpdateFn = ReturnType<typeof useFilter>['updateFilter']

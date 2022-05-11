@@ -31,10 +31,13 @@ import { FilterSentence } from "./component/filter/FilterSentence"
 import { FilterMeta } from "./component/filter/FilterMeta"
 import { FilterFile } from "./component/filter/FilterFile"
 import { Filter } from "./component/Filter"
+import { FilterScrollable } from "./component/FilterScrollable"
 
 // export default (global: boolean) => !global ? '⏯️ SPACE | 🔄 R | 🔪 C | ⬇️ Ctrl+D' : '🔄 Ctrl+Shift+R | 🔪 Ctrl+Shift+C'
 
 type Props = { }
+
+const TOP_SIZE = '340px'
 
 export default ((props) => {
     const { setWS, chopLoading, controls, isPlaying, startDrag } = useWaveSurfer()
@@ -60,28 +63,40 @@ export default ((props) => {
             setPinned={settings.setPinned} 
         />
 
-        <Space h='lg' />
+        <Box
+            sx={(theme) => ({
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                gap: theme.spacing.xl
+            })}
+        >
+            <Box>
+                <Space h='xl' />
 
-        <FancyHeader />
+                <FancyHeader />
 
-        <Space h='xl' />
-        <Space h='sm' />
+                <Space h='xl' />
+                <Space h='sm' />
 
-        <Container size={350} px='xl' >
-            <ChopSection 
-                chop={chop} prev={prev} next={next}
-                chopLoading={chopLoading}
-                chopsAvailable={chopsAvailable}
-                setWS={setWS}
-                startDrag={startDrag} 
-            />
-        </Container>
+                <ChopSection 
+                    chop={chop} prev={prev} next={next}
+                    chopLoading={chopLoading}
+                    chopsAvailable={chopsAvailable}
+                    setWS={setWS}
+                    startDrag={startDrag} 
+                />
+
+                <Space h='xs' />
+
+            </Box>
         
-        <Filter 
-            chopSummary={chopSummary}
-            filter={filter}
-            updateFilter={updateFilter}
-            loading={loading}
-        />       
+            <FilterScrollable
+                chopSummary={chopSummary}
+                filter={filter}
+                updateFilter={updateFilter}
+                loading={loading}
+            /> 
+        </Box>
     </>)
 }) as FunctionComponent<Props>

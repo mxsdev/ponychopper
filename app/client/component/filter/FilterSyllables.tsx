@@ -14,7 +14,7 @@ export const FilterSyllables: FunctionComponent<Props> = ({ syllables, updateSyl
         <FilterSection header="Syllables">
             <HybridSlider 
                 value={syllables}
-                setValue={(v, local) => updateSyllables(v, local)}
+                setValue={(v, local) => updateSyllables({ numSyllables: v }, local)}
         
                 max={16}
                 marks={[0, 4, 8, 12, 16].map(v => ({ value: v, label: String(v) }))}

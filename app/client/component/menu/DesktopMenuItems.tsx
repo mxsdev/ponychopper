@@ -24,9 +24,10 @@ export default ((props) => {
     return (<>
         <Stack
             sx={(theme) => ({
-                position: 'absolute',
+                position: 'fixed',
                 top: theme.spacing.sm,
-                left: theme.spacing.sm
+                left: theme.spacing.sm,
+                zIndex: 2
             })}
 
             spacing='sm'

@@ -12,9 +12,10 @@ type Props = PropsWithChildren<OwnProps>
 
 const useStyles = createStyles((theme) => ({
     wrapper: {
-        backgroundColor: theme.colors.bg[0],
+        backgroundColor: theme.colors.bg2[0],
         padding: theme.spacing.sm,
-        boxShadow: theme.shadows.sm
+        boxShadow: theme.shadows.sm,
+        height: '100%'
     }
 }))
 

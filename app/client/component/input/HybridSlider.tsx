@@ -40,7 +40,9 @@ export const HybridSlider: FunctionComponent<Props> = ({ value, setValue, min=0,
                 disabled={disabled}
 
                 checked={isRange}
-                onChange={(e) => setMode(e.currentTarget.checked)}
+                onChange={({ target: { checked } }) => {
+                    setMode(checked)
+                }}
 
                 sx={(theme) => ({
                     marginRight: theme.spacing.md

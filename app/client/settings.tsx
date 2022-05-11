@@ -65,7 +65,7 @@ export const Settings: FunctionComponent<Props> = (props) => {
                             setGlobalHotkeysEnabled={(val) => updateSettings({ globalHotkeysEnabled: val })}
                         />
                     ),
-                    theme: <SettingsTheme />
+                    // theme: <SettingsTheme />
                 }}
             />
         </Box>

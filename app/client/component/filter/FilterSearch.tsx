@@ -1,4 +1,4 @@
-import { Radio, RadioGroup, TextInput } from "@mantine/core"
+import { Radio, RadioGroup, Space, TextInput } from "@mantine/core"
 import { FilterOpts } from "chops/chops"
 import { FilterUpdate } from "client/util/localFilter"
 import React, { FunctionComponent } from "react"
@@ -39,6 +39,8 @@ export const FilterSearch: FunctionComponent<Props> = ({ updateSearch, query, ty
                 value={query}
                 onChange={({ target: { value } }) => updateQuery(value)}
             />
+
+            <Space h='xs' />
 
             <RadioGroup size='sm'
                 value={type}

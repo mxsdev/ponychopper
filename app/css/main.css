@@ -28,3 +28,9 @@ body,
 		background-position: 0% 50%;
 	}
 }
+
+/* @property --top-pos {
+	syntax: '<percentage>';
+	initial-value: 20%;
+	inherits: false;
+} */

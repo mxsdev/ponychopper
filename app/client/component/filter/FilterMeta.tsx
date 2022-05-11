@@ -1,4 +1,4 @@
-import { Chip, Chips } from "@mantine/core"
+import { Chip, Chips, Space } from "@mantine/core"
 import { FilterUpdate } from "client/util/localFilter"
 import React, { FunctionComponent } from "react"
 import { usePossiblyUndefinedList } from "util/list"
@@ -39,6 +39,11 @@ export const FilterMeta: FunctionComponent<Props> = ({ season, updateMeta, seaso
                 value={speakerValues}
 
                 onChange={updateSpeakerValues}
+                
+                sx={(theme) => ({
+                    // TODO: add another spacing variable of size xs/2
+                    marginTop: `calc(${theme.spacing.xs}px / 2)`
+                })}
             >
                 {seasonList.map(s => (
                     <Chip value={convert(s)}>

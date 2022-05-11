@@ -9,7 +9,7 @@ const ICON_SIZE = '1.5rem'
 const SettingsTabMeta = {
     directory: { label: 'Directory', icon: MdFolderOpen },
     hotkeys: { label: 'Hotkeys', icon: MdOutlineKeyboard },
-    theme: { label: 'Theme', icon: BiBrush }
+    // theme: { label: 'Theme', icon: BiBrush }
 } as const
 
 type TabIds = keyof typeof SettingsTabMeta

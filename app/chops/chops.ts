@@ -550,7 +550,9 @@ type FilterSearch = {
 }
 
 export type FilterOpts = {
-    syllables?: NumericComparison,
+    syllables?: {
+        numSyllables: NumericComparison
+    },
     speaker?: {
         in: ChopSpeakerList,
         nonstrict?: boolean
@@ -633,7 +635,7 @@ function filterChops(selections: ChopSelection[], opts: FilterOpts): ChopSelecti
 
     return selections
         // syllables
-        .filter((sel) => compareObj(sel.syllables, opts.syllables))
+        .filter((sel) => compareObj(sel.syllables, opts.syllables?.numSyllables))
         // speaker
         .filter((sel) => {
             const compare = (s: ChopSpeaker|undefined) => opts.speaker?.in.includes(s)

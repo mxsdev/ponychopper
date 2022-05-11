@@ -1,4 +1,4 @@
-import { TextInput, ScrollArea, Checkbox } from "@mantine/core"
+import { TextInput, ScrollArea, Checkbox, Space } from "@mantine/core"
 import { FilterUpdate } from "client/util/localFilter"
 import React, { FunctionComponent } from "react"
 import { useEffect } from "react"
@@ -22,6 +22,8 @@ export const FilterFile: FunctionComponent<Props> = ({ fileNames, files, updateF
                 placeholder='Filter...'
                 size='xs'
             />
+
+            <Space h='xs' />
 
             <ScrollArea sx={{ maxHeight: '300px' }}>
                 {fileNames.map(f => <Checkbox 
