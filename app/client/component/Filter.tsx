@@ -1,160 +1,75 @@
-// import { useLocalStorage } from "helpers"
-// import { Character, listCharacters, listSeasons, listSongs, Season, Song } from "locale"
-// import React, { FunctionComponent, PropsWithChildren } from "react"
+import { Container } from "@mantine/core"
+import { ChopFileSummary, FilterOpts } from "chops/chops"
+import React, { FunctionComponent } from "react"
+import { FilterFile } from "./filter/FilterFile"
+import { FilterMeta } from "./filter/FilterMeta"
+import { FilterPitch } from "./filter/FilterPitch"
+import { FilterSearch } from "./filter/FilterSearch"
+import { FilterSentence } from "./filter/FilterSentence"
+import { FilterSpeaker } from "./filter/FilterSpeaker"
+import { FilterSyllables } from "./filter/FilterSyllables"
 
-// interface OwnProps {
-//     filterOpts: FilterOpts,
-//     updateFilterOpts: (opts: Partial<FilterOpts>) => void
-// }
+type Props = {
+    filter: FilterOpts,
+    updateFilter: <T extends keyof FilterOpts>(key: T, data: Partial<NonNullable<FilterOpts[T]>>, local?: boolean) => void,
+    chopSummary: ChopFileSummary|null,
+    loading: boolean
+}
 
-// type Props = OwnProps
+export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSummary, loading }) => {
+    if(loading || !chopSummary) return <></>
 
-// const charaList = listCharacters()
-// const seasonList = listSeasons()
-// const songList = listSongs()
+    return (<>
+        <Container>
+            {/* Search */}
+            <FilterSearch 
+                query={filter?.search?.query ?? ''}
+                type={filter?.search?.type ?? 'fuzzy'}
+                updateSearch={(d) => updateFilter('search', d)}
+            />
 
-// export default (({ filterOpts, updateFilterOpts }) => {
-//     const [open, setOpen] = useLocalStorage<boolean>('filterOpen', false)
+            {/* Syllables */}
+            <FilterSyllables 
+                syllables={filter.syllables}
+                updateSyllables={(d, local) => updateFilter('syllables', d, local)}
+            />
 
+            {/* Speaker */}
+            <FilterSpeaker 
+                speakers={filter.speaker?.in ?? []}
+                speakerList={chopSummary.speakers}
+                updateSpeakers={(d, local) => updateFilter('speaker', d, local)}
+            />
 
-//     const toggleCharacter = (id: Character, toggled: boolean) => {
-//         updateFilterOpts({
-//              characters: [
-//                 ...filterOpts.characters.filter(c => c !== id),
-//                 ...(toggled ? [id] : [])
-//             ] 
-//         })
-//     }
+            {/* Pitch */}
+            <FilterPitch 
+                classes={filter.pitch?.classes ?? []}
+                nonstrict={!!filter.pitch?.nonstrict}
+                octaves={filter.pitch?.octaves}
+                updatePitch={(d, local) => updateFilter('pitch', d, local)}
+            />
 
-//     const toggleSeason = (season: Season, toggled: boolean) => {
-//         updateFilterOpts({
-//             seasons: [
-//                 ...filterOpts.seasons.filter(s => s !== season),
-//                 ...(toggled ? [season] : [])
-//             ]
-//         })
-//     }
+            {/* Sentence */}
+            <FilterSentence 
+                word={!!filter.sentence?.word}
+                other={!!filter.sentence?.other}
+                numWords={filter.sentence?.numWords}
+                updateSentence={(d, local) => updateFilter('sentence', d, local)}
+            />
+            
+            {/* Meta */}
+            <FilterMeta
+                season={filter.meta?.season ?? []}
+                seasonList={chopSummary.meta.seasons}
+                updateMeta={(d, local) => updateFilter('meta', d, local)}
+            />
 
-//     const toggleSong = (song: Song, toggled: boolean) => {
-//         updateFilterOpts({
-//             songs: [
-//                 ...filterOpts.songs.filter(s => s !== song),
-//                 ...(toggled ? [song] : [])
-//             ]
-//         })
-//     }
-
-//     return (<>
-//         <p className="font-mono mt-4 text-left text-lg font-bold select-none hover:cursor-pointer" onClick={() => setOpen(!open)}>Filter {!open ? '▲' : '▼'}</p>
-
-//         {open ? 
-//             <div className='filter-container'>
-//                 <FilterRow>
-//                     <FilterCol1>
-//                         <FilterBox 
-//                             key={'characters'}
-//                             id={'characters'}
-
-//                             onCheck={(c) => updateFilterOpts({
-//                                 characters: c ? charaList.map(c => c.key) : []
-//                             })}
-//                             defaultChecked={true}
-
-//                             label="Characters"
-//                         />
-//                     </FilterCol1>
-//                     <FilterCol2>
-//                         { charaList.map(char => (<>
-//                             <FilterBox 
-//                                 key={char.key} 
-//                                 id={char.key} 
-//                                 checked={filterOpts.characters.includes(char.key)}
-//                                 onCheck={(c) => toggleCharacter(char.key, c)}
-//                                 label={char.name}
-//                             />
-//                         </>)) }
-//                     </FilterCol2>
-//                 </FilterRow>
-
-//                 <FilterRow>
-//                     <FilterCol1>
-//                         <FilterBox 
-//                             key={'seasons'}
-//                             id={'seasons'}
-
-//                             onCheck={(c) => updateFilterOpts({
-//                                 seasons: c ? seasonList : []
-//                             })}
-
-//                             defaultChecked={true}
-
-//                             label="Seasons"
-//                         />
-//                     </FilterCol1>
-//                     <FilterCol2>
-//                         { seasonList.map(season => (<>
-//                             <FilterBox 
-//                                 key={season}
-//                                 id={`season-${season}`}
-
-//                                 checked={filterOpts.seasons.includes(season)}
-//                                 onCheck={(c) => toggleSeason(season, c)}
-
-//                                 label={season}
-//                             />
-//                         </>)) }
-//                     </FilterCol2>
-//                 </FilterRow>
-                
-//                 <FilterRow>
-//                     <FilterCol1>
-//                         <FilterBox 
-//                             key={'songs'}
-//                             id={'songs'}
-
-//                             onCheck={(c) => updateFilterOpts({
-//                                 songs: c ? songList.map(s => s.key) : []
-//                             })}
-
-//                             defaultChecked={true}
-
-//                             label="Songs"
-//                         />
-//                     </FilterCol1>
-//                     <FilterCol2>
-//                         { songList.map(song => (<>
-//                             <FilterBox 
-//                                 key={`song-${song.key}`}
-//                                 id={`song-${song.key}`}
-
-//                                 checked={filterOpts.songs.includes(song.key)}
-
-//                                 onCheck={(c) => toggleSong(song.key, c)}
-
-//                                 label={song.name}
-//                             />
-//                         </>)) }
-//                     </FilterCol2>
-//                 </FilterRow>
-//             </div>
-//         : ''}
-//     </>)
-// }) as FunctionComponent<Props>
-
-// const FilterCheckbox: FunctionComponent<{ label: string, checked: boolean, setChecked: (checked: boolean) => void, id: string }> = (props) => <div>
-//     <input id={props.id} />
-//     <span className=""></span>
-    
-// </div>
-
-// const FilterRow: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className='flex justify-around'>{children}</div>
-// const FilterCol1: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className="flex-col w-36 flex-initial">{children}</div>
-// const FilterCol2: FunctionComponent<PropsWithChildren<{}>> = ({children}) => <div className="flex-col flex-1">{children}</div>
-// const FilterBox: FunctionComponent<{id: string, checked?: boolean, defaultChecked?: boolean, onCheck: (checked: boolean) => void, label?: string}> = ({id, checked, onCheck, label, defaultChecked}) => <div className={"inline-block select-none" + ((label) ? " mr-2" : "")}>
-//     <input id={id} type="checkbox" 
-//         checked={checked}
-//         defaultChecked={defaultChecked}
-//         onChange={(e) => onCheck(e.target.checked)}
-//     />
-//     {label ? <label htmlFor={id} className="select-none ml-1">{label}</label> : <></>}
-// </div>
+            {/* File */}
+            <FilterFile 
+                fileNames={chopSummary.fileNames}
+                files={filter.file ?? []}
+                updateFiles={(d, local) => updateFilter('file', d, local)}
+            />
+        </Container>
+    </>)
+}
