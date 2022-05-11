@@ -1,4 +1,4 @@
-import { Box, Switch, RangeSlider, Slider } from "@mantine/core";
+import { Box, Switch, RangeSlider, Slider, Space } from "@mantine/core";
 import React, { FunctionComponent } from "react"
 import { NumericComparison } from "util/types/numeric";
 
@@ -30,7 +30,7 @@ export const HybridSlider: FunctionComponent<Props> = ({ value, setValue, min=0,
         }
     }
 
-    return (  
+    return (<>
         <Box
             sx={{
                 display: 'flex'
@@ -88,5 +88,9 @@ export const HybridSlider: FunctionComponent<Props> = ({ value, setValue, min=0,
                     />
                 }
             </Box>
-        </Box>)
+        </Box>
+        
+        <Space h='xs' />
+        
+        </>)
 }

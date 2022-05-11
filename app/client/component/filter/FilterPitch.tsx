@@ -108,11 +108,13 @@ export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, update
                 />
             </Box>
 
+            <Space h='xs' />
+
             <FilterSubheader text="Octave" />
 
             <HybridSlider 
                 value={octaves}
-                setValue={(octaves) => updatePitch({ octaves })}
+                setValue={(octaves, local) => updatePitch({ octaves }, local)}
 
                 max={12}
                 marks={[0, 4, 8, 12].map(i => ({ value: i, label: String(i) }))}

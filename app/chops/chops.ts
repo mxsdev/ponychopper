@@ -571,7 +571,9 @@ export type FilterOpts = {
         numWords?: NumericComparison,
         // numPhrases?: NumericComparison
     },
-    file?: string[],
+    file?: {
+        in: string[]
+    },
     search?: FilterSearch
 }
 
@@ -669,7 +671,7 @@ function filterChops(selections: ChopSelection[], opts: FilterOpts): ChopSelecti
         })
         // file
         .filter((sel) => {
-            return (opts?.file ?? []).includes(fileBaseName(sel.chopFile))
+            return (opts?.file?.in ?? []).includes(fileBaseName(sel.chopFile))
         })
         // search
         .filter((sel) => searchRes.includes(sel))

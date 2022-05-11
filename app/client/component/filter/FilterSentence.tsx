@@ -35,7 +35,7 @@ export const FilterSentence: FunctionComponent<Props> = ({ word, other, numWords
 
             value={numWords}
 
-            setValue={(v) => updateSentence({ numWords: v })}
+            setValue={(v, local) => updateSentence({ numWords: v }, local)}
         />
         </FilterSection>
     </>)

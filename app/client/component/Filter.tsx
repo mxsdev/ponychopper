@@ -1,6 +1,7 @@
 import { Container } from "@mantine/core"
 import { ChopFileSummary, FilterOpts } from "chops/chops"
 import React, { FunctionComponent } from "react"
+import { FilterContainer } from "./filter/FilterContainer"
 import { FilterFile } from "./filter/FilterFile"
 import { FilterMeta } from "./filter/FilterMeta"
 import { FilterPitch } from "./filter/FilterPitch"
@@ -20,7 +21,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
     if(loading || !chopSummary) return <></>
 
     return (<>
-        <Container>
+        <FilterContainer>
             {/* Search */}
             <FilterSearch 
                 query={filter?.search?.query ?? ''}
@@ -67,9 +68,9 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
             {/* File */}
             <FilterFile 
                 fileNames={chopSummary.fileNames}
-                files={filter.file ?? []}
+                files={(filter.file?.in) ?? []}
                 updateFiles={(d, local) => updateFilter('file', d, local)}
             />
-        </Container>
+        </FilterContainer>
     </>)
 }

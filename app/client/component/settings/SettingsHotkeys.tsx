@@ -37,7 +37,7 @@ export const SettingsHotkeys: FunctionComponent<Props> = ({ localHotkeys, global
 
         <HotkeySetter 
             hotkey={globalHotkeys}
-            disabled={globalHotkeysEnabled}
+            disabled={!globalHotkeysEnabled}
             setHotkey={(id, hk) => updateHotkeys('global', id, hk)}
         />
         

@@ -3,7 +3,7 @@ import { ChopFileSummary, FilterOpts } from "./chops";
 
 export function defaultFilter(summary: ChopFileSummary): FilterOpts {
     return {
-        file: summary.fileNames,
+        file: { in: summary.fileNames },
         meta: {
             season: summary.meta.seasons
         },
