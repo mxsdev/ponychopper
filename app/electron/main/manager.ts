@@ -40,6 +40,10 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
         manager.prev()
     })
 
+    IPCMainListen('expand', (event, direction) => {
+        manager.expand(direction)
+    })
+
     IPCMainListen('ready', (event, from) => {
         IPCMainSend(event.sender, 'filesStatus', manager.getFileStatus())
         IPCMainSend(event.sender, 'set_filter', manager.getFilter())

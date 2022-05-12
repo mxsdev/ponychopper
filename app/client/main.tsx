@@ -44,13 +44,13 @@ export default ((props) => {
 
     const { settingsOpened, toggleSettings, ...settings} = useSettings()
 
-    const { chop, prev, next, loading: filesLoading, chopsEnabled, chopSummary } = useChops()
+    const { chop, prev, next, expandSelection, loading: filesLoading, chopsEnabled, chopSummary } = useChops()
 
     const loading = chopLoading || filesLoading
 
     const { userSettings } = useUserSettings()
 
-    useLocalHotkeys(userSettings.localHotkeys, { chop, prev, next, controls })
+    useLocalHotkeys(userSettings.localHotkeys, { chop, prev, next, controls, expandSelection })
 
     const { filter, updateFilter, chopsAvailable } = useFilter()
 

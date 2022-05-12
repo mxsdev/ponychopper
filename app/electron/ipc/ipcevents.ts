@@ -16,6 +16,7 @@ export type IPCRendererEvents = EventList<{
     chop: [ ],
     next: [ ],
     prev: [ ],
+    expand: [ direction: 'right'|'left' ]
 
     ready: [ from: WindowType ],
     

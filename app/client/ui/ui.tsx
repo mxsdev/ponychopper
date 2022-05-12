@@ -26,7 +26,6 @@ const SliderStyles = {
             }
         },
         mark: {
-            // borderColor: 'rgba(0, 0, 0, 0)'
             border: 'none',
             backgroundClip: 'content-box',
             padding: '1px',
@@ -55,7 +54,6 @@ export const wrapUIProvider = (node: React.ReactNode) => (
                     '&:hover': {
                         backgroundColor: 'rgba(1, 1, 1, 0.1)',
                     },
-                    // color: theme.colors[params.color ?? 'primary'][7]
                 }
             }),
             Button: (theme) => ({

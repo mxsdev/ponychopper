@@ -190,6 +190,19 @@ export const fragmentsToSpeech = (fragments: ChopFragment[], words: ChopWord[]):
     return { speech, word: { leftFull, rightFull, numWords }}
 }
 
+export const expandSelection = (selection: ChopSelection, direction: 'right'|'left'): ChopSelection => {
+    const fragments = selection.chopFile.chops
+
+    const startpos = selection.fragmentIndex + (direction === 'left' ? -1 : 0)
+    const endpos = startpos + selection.fragmentLength + (direction === 'left' ? -1 : 0)
+
+    if(startpos >= 0 && endpos < fragments.length) {
+        return fragmentsToSelection(selection.fileIndex, selection.chopFile, fragments.slice(startpos, endpos), selection.chopFile.words, startpos, selection.fragmentLength + 1)
+    }
+
+    return selection
+}
+
 export const fragmentsToSelection = (fileIndex: number, chopFile: ChopFile, fragments: ChopFragment[], words: ChopWord[], fragmentIndex: number, fragmentLength: number): ChopSelection => {
     // get pitch list without duplicates
     const pitches: ChopPitchList = []
@@ -515,7 +528,7 @@ function getAllChopSelections(file: ChopFile, fileIndex: number): ChopSelection[
                         file,
                         chunk.slice(x, y+1),
                         file.words,
-                        x+k, y+k
+                        x+k, y-x+1
                     )
                 )
             }

@@ -21,6 +21,7 @@ export const useChops = () => {
 
     const prev = () => api.prevChop()
     const next = () => api.nextChop()
+    const expandSelection = (direction: 'right'|'left') => api.expandSelection(direction)
 
     return {
         loading,
@@ -29,6 +30,7 @@ export const useChops = () => {
         
         chop,
         prev,
-        next
+        next,
+        expandSelection
     }
 }

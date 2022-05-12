@@ -35,6 +35,10 @@ export function nextChop() {
     IPCRendererSend('next')
 }
 
+export function expandSelection(direction: 'right'|'left') {
+    IPCRendererSend('expand', direction)
+}
+
 export function signalReady(from: WindowType) {
     IPCRendererSend('ready', from)
 }

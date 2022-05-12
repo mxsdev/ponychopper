@@ -3,7 +3,7 @@ import { getWaveMeta, WaveMeta } from '../util/riff'
 import { exists, getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
-import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator } from './chops'
+import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator, expandSelection } from './chops'
 import path from 'path'
 import fs from 'fs'
 import EventEmitter from 'events'
@@ -217,6 +217,13 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
     next() {
         this.selection.next()
         return this.current()
+    }
+
+    expand(direction: 'right'|'left') {
+        const curr = this.current()
+        if(!curr) return
+
+        this.selection.push(expandSelection(curr, direction))
     }
 
     numFiles() {

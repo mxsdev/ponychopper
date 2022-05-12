@@ -3,7 +3,7 @@ import { ELECTRON_CONFIG } from "electron/config"
 import { IPCMainHandlers } from "electron/ipc/ipchandlers"
 import { IPCRendererInvoke, IPCRendererSend } from "electron/ipc/ipcrenderer"
 import { UserSettingsData } from "electron/main/settings"
-import { chop, prevChop, nextChop, filter, signalReady, beginDrag, reloadFiles } from "./chop"
+import { chop, prevChop, nextChop, filter, signalReady, beginDrag, reloadFiles, expandSelection } from "./chop"
 
 export default {
     setPinned: (pinned: boolean) => {
@@ -22,7 +22,7 @@ export default {
     
     openLink: (url: string) => IPCRendererInvoke('open_external_link', url),
 
-    chop, prevChop, nextChop,
+    chop, prevChop, nextChop, expandSelection,
     filter, signalReady, beginDrag,
     reloadFiles
 }

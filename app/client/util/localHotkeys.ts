@@ -6,7 +6,8 @@ type Actions = {
     controls: AudioControls, 
     chop: () => void,
     next: () => void,
-    prev: () => void
+    prev: () => void,
+    expandSelection: (direction: 'left'|'right') => void
 }
 
 export const useLocalHotkeys = (hotkeys: HotkeyList, actions: Actions) => {
@@ -42,6 +43,12 @@ export const useLocalHotkeys = (hotkeys: HotkeyList, actions: Actions) => {
                     break
                 case 'replay':
                     actions.controls.restart()
+                    break
+                case 'expand_left':
+                    actions.expandSelection('left')
+                    break
+                case 'expand_right':
+                    actions.expandSelection('right')
                     break
             }
         }
