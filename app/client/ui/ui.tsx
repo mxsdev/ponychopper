@@ -6,6 +6,17 @@ import { Tuple } from "util/types/tuple";
 const bg = 'rgba(1, 1, 1, 0.1)'
 const bg2 = 'rgba(1, 1, 1, 0.05)'
 
+const SelectStyles = {
+    styles: (theme: any) => ({
+        input: {
+            backgroundColor: `${theme.colors.bg2[0]} !important`,
+            '::placeholder': {
+                color: theme.colors.dark[3]
+            }
+        },
+    })
+}
+
 export const wrapUIProvider = (node: React.ReactNode) => (
     <MantineProvider
         theme={{
@@ -68,20 +79,8 @@ export const wrapUIProvider = (node: React.ReactNode) => (
                     }
                 })
             },
-            Select: {
-                styles: (theme: any) => ({
-                    input: {
-                        backgroundColor: `${theme.colors.bg2[0]} !important`,
-                        '::placeholder': {
-                            color: theme.colors.dark[3]
-                        }
-                    },
-                    // dropdown: {
-                    //     backgroundColor: `${theme.colors.bg2[0]}`
-                    // }
-
-                })
-            },
+            Select: SelectStyles,
+            NativeSelect: SelectStyles,
             Chips: {
                 styles: (theme: any) => ({ 
                     label: { 

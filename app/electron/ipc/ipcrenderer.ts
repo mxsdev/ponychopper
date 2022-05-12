@@ -20,5 +20,5 @@ export function IPCRendererSend<E extends keyof IPCRendererEvents>(channel: E, .
 }
 
 export function IPCRendererInvoke<C extends keyof IPCMainHandlers>(channel: C, ...args: Parameters<IPCMainHandlers[C]>): Promise<Awaited<ReturnType<IPCMainHandlers[C]>>> {
-    return ipcRenderer.invoke(channel, args) as Promise<Awaited<ReturnType<IPCMainHandlers[C]>>>
+    return ipcRenderer.invoke(channel, ...args) as Promise<Awaited<ReturnType<IPCMainHandlers[C]>>>
 }

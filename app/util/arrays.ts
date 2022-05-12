@@ -31,7 +31,15 @@ export function shuffle<T>(array: T[]) {
     }
   }
 
-export function includeElement<T>(arr: T[], el: T, include: boolean): T[] {
+export function includeElement<T>(arr: T[], el: T, include: boolean, options?: { full: T[], soloMode: boolean }): T[] {
+  if(options?.soloMode && options?.full) {
+    if(arr.some(x => (x !== el))) {
+      return [ el ]
+    } else {
+      return options.full
+    }
+  }
+
   return [
     ...arr.filter(x => x !== el),
     ...(include ? [ el ] : [])

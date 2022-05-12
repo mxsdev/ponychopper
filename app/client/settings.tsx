@@ -17,6 +17,7 @@ import { SettingsDirectory } from "./component/settings/SettingsDirectory"
 import { SettingsHotkeys } from "./component/settings/SettingsHotkeys"
 import { SettingsTheme } from "./component/settings/SettingsTheme"
 import { SettingsTabs } from "./component/settings/SettingsTabs"
+import { SettingsInfo } from "./component/settings/SettingsInfo"
 
 type Props = {
     
@@ -65,7 +66,13 @@ export const Settings: FunctionComponent<Props> = (props) => {
                             setGlobalHotkeysEnabled={(val) => updateSettings({ globalHotkeysEnabled: val })}
                         />
                     ),
-                    // theme: <SettingsTheme />
+                    // theme: <SettingsTheme />,
+                    info: (
+                        <SettingsInfo
+                            version={APP_VERSION}
+                            issueHref={`${APP_REPOSITORY_URL}/issues`}
+                        />
+                    )
                 }}
             />
         </Box>

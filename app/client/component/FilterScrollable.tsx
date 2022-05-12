@@ -6,7 +6,7 @@ import { Filter } from "./Filter"
 
 type Props = ComponentProps<typeof Filter>
 
-const gradient_size = '2.5%'
+const gradient_size = '5%'
 
 export const FilterScrollable: FunctionComponent<Props> = (props) => {
     const [ topGradient, setTopGradient ] = useState<boolean>()

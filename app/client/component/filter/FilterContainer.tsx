@@ -8,7 +8,7 @@ interface Props {
 
 const Breakpoints = {
     default: {
-        size: '420px',
+        size: '375px',
         span: 12
     },
     'md': {
@@ -27,12 +27,16 @@ export const FilterContainer: FunctionComponent<Props> = (props) => {
     const isMd = useMediaQuery(`(min-width: ${Breakpoints.md.breakpoint})`)
     const isLg = useMediaQuery(`(min-width: ${Breakpoints.lg.breakpoint})`)
 
-    const breakpoint = isLg ? 'lg' : (isMd ? 'md' : 'default')
+    const breakpoint = (() => {
+        if(isMd) return 'md'
+        if(isLg) return 'lg'
+        return 'default'
+    })()
 
     return (<>
             <Grid grow
                 sx={(theme) => ({
-                    maxWidth: '420px',
+                    maxWidth: Breakpoints.default.size,
                     ...((['md', 'lg'] as const).reduce((prev, bp) => ({
                         ...prev,
                         [`@media (min-width: ${Breakpoints[bp].breakpoint})`]: {

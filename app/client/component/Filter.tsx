@@ -23,6 +23,8 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
 
     if(loading || !chopSummary) return <></>
 
+    const soloMode = modMain
+
     return (<>
         <FilterContainer>
             {/* Pitch */}
@@ -31,7 +33,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
                 nonstrict={!!filter.pitch?.nonstrict}
                 octaves={filter.pitch?.octaves}
                 updatePitch={(d, local) => updateFilter('pitch', d, local)}
-                soloMode={modMain}
+                soloMode={soloMode}
             />
 
             {/* Sentence */}
@@ -53,6 +55,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
                 speakers={filter.speaker?.in ?? []}
                 speakerList={chopSummary.speakers}
                 updateSpeakers={(d, local) => updateFilter('speaker', d, local)}
+                soloMode={soloMode}
             />
             
             {/* Meta */}
@@ -60,6 +63,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
                 season={filter.meta?.season ?? []}
                 seasonList={chopSummary.meta.seasons}
                 updateMeta={(d, local) => updateFilter('meta', d, local)}
+                soloMode={soloMode}
             />
 
             {/* Search */}
@@ -74,6 +78,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
                 fileNames={chopSummary.fileNames}
                 files={(filter.file?.in) ?? []}
                 updateFiles={(d, local) => updateFilter('file', d, local)}
+                soloMode={soloMode}
             />
         </FilterContainer>
     </>)

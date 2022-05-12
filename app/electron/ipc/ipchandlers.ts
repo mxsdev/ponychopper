@@ -6,5 +6,6 @@ type HandlerList<T extends { [channel: string]: (...args: any[]) => Promise<any>
 
 export type IPCMainHandlers = HandlerList<{
     get_folder: (opts?: { title?: string, defaultDirectory?: string }) => Promise<OpenDialogReturnValue>,
-    load_files: () => Promise<ChopFileSummary>
+    load_files: () => Promise<ChopFileSummary>,
+    open_external_link: (link: string) => Promise<void>
 }>

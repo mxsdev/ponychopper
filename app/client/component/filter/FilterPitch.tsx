@@ -20,23 +20,11 @@ type Props = {
 const PitchKeyValues = PitchKeys.map((_, i) => i+1)
 
 export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, updatePitch, nonstrict, soloMode }) => {
-    const updateClasses = (checked: boolean, key: number|undefined) => {
-        const otherChecked = classes.filter(x => x != null && x !== key).length > 0
-
-        if(soloMode) {
-            if(otherChecked) {
-                updatePitch({ classes: [ key ] })
-            } else {
-                updatePitch({ classes: [...PitchKeyValues, undefined] })
-            }
-
-            return
-        }
-
-        updatePitch({
-            classes: includeElement(classes, key, checked)
+    const updateClasses = (checked: boolean, key: number|undefined) => updatePitch({
+        classes: includeElement(classes, key, checked, {
+            soloMode, full: [...PitchKeyValues, undefined]
         })
-    }
+    })
 
     return (<>
         <FilterSection header="Pitch">
@@ -83,7 +71,7 @@ export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, update
                 <NativeSelect
                     variant='filled'
                     size='xs'
-                    
+
                     data={PitchKeys.flatMap(((key, i) => [
                         { value: `${i+1},maj`, label: `${key} major` },
                         { value: `${i+1},min`, label: `${key} minor` }

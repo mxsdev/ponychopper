@@ -22,8 +22,10 @@ export function defaultFilter(summary: ChopFileSummary): FilterOpts {
             nonstrict: false
         },
         syllables: {
-            gte: 1,
-            lte: 16
+            numSyllables: {
+                gte: 1,
+                lte: 16
+            }
         },
         search: {
             query: '',

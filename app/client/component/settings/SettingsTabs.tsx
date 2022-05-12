@@ -2,14 +2,15 @@ import { Tabs } from "@mantine/core"
 import { useLocalStorage } from "client/util/storage"
 import React, { FunctionComponent, Component, ReactNode } from "react"
 import { BiBrush } from "react-icons/bi"
-import { MdFolderOpen, MdOutlineKeyboard } from "react-icons/md"
+import { MdFolderOpen, MdOutlineInfo, MdOutlineKeyboard } from "react-icons/md"
 
 const ICON_SIZE = '1.5rem'
 
 const SettingsTabMeta = {
     directory: { label: 'Directory', icon: MdFolderOpen },
     hotkeys: { label: 'Hotkeys', icon: MdOutlineKeyboard },
-    // theme: { label: 'Theme', icon: BiBrush }
+    // theme: { label: 'Theme', icon: BiBrush },
+    info: { label: 'Info', icon: MdOutlineInfo }
 } as const
 
 type TabIds = keyof typeof SettingsTabMeta

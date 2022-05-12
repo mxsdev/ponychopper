@@ -1,7 +1,7 @@
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
-import { WEBPACK_MODE, IS_DEVELOPER, DO_HMR, TS_TRANSPILE_ONLY } from './webpack.config.env'
+import { WEBPACK_MODE, IS_DEVELOPER, DO_HMR, TS_TRANSPILE_ONLY, VERSION, REPOSITORY_URL } from './webpack.config.env'
 import { PROJECT_PATHS } from './webpack.config.paths'
-import webpack from 'webpack'
+import webpack, { DefinePlugin } from 'webpack'
 import HTMLWebpackPlugin from 'html-webpack-plugin'
 import fs from 'fs'
 import path from 'path'
@@ -61,6 +61,10 @@ const CFG_REACT_MAIN: webpack.Configuration = {
             filename: DIST_INDEX_HTML,
             inject: false,
         }),
+        new DefinePlugin({
+            APP_VERSION: `"${VERSION}"`,
+            APP_REPOSITORY_URL: `"${REPOSITORY_URL}"`
+        })
     ],
     stats: 'minimal',
     output: {

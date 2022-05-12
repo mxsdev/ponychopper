@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, contextBridge, globalShortcut, ipcRenderer, dialog } from 'electron'
+import { app, BrowserWindow, ipcMain, contextBridge, globalShortcut, ipcRenderer, dialog, shell } from 'electron'
 import path from 'path'
 import { ELECTRON_CONFIG } from './config'
 import { ChopFileManager } from 'chops/chopManager'
@@ -34,9 +34,16 @@ IPCMainHandle('get_folder', (event, opts) => {
     const windowFrom = windowManager.findWindow(event.sender.id)
     if(!windowFrom) throw new Error('Window not found')
 
+    console.log(opts)
+
     return dialog.showOpenDialog(windowFrom, {
         properties: [ 'openDirectory' ],
         title: opts?.title,
         defaultPath: opts?.defaultDirectory,
     })
+})
+
+// open external link
+IPCMainHandle('open_external_link', async (_, url) => {
+    return shell.openExternal(url)
 })

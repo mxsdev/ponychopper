@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
+  "repository": "https://github.com/charburgx/ponychopper",
   "scripts": {
     "test": "mocha",
     "serve": "concurrently -n \u001b[34mui-webpack\u001b[0m,\u001b[34melectron-webpack\u001b[0m,\u001b[32melectron\u001b[0m \"yarn serve:ui\" \"yarn watch:electron\" \"yarn dev\"",

@@ -20,6 +20,8 @@ export default {
 
     getDirectory: (...args: Parameters<IPCMainHandlers['get_folder']>) => IPCRendererInvoke('get_folder', ...args),
     
+    openLink: (url: string) => IPCRendererInvoke('open_external_link', url),
+
     chop, prevChop, nextChop,
     filter, signalReady, beginDrag,
     reloadFiles
