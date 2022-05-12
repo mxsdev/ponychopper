@@ -47,14 +47,6 @@ export const HybridSlider: FunctionComponent<Props> = ({ value, setValue, min=0,
                 sx={(theme) => ({
                     marginRight: theme.spacing.md
                 })}
-
-                styles={{
-                    input: {
-                        ':hover': {
-                            cursor: 'pointer'
-                        }
-                    }
-                }}
             />
             
             <Box

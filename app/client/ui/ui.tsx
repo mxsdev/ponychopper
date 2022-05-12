@@ -13,7 +13,27 @@ const SelectStyles = {
             '::placeholder': {
                 color: theme.colors.dark[3]
             }
+        }
+    })
+}
+
+const SliderStyles = {
+    styles: (theme: any) => ({
+        track: {
+            '::before': {
+                backgroundColor: `${theme.colors.bg[0]}`,
+                boxShadow: theme.shadows.md
+            }
         },
+        mark: {
+            // borderColor: 'rgba(0, 0, 0, 0)'
+            border: 'none',
+            backgroundClip: 'content-box',
+            padding: '1px',
+        },
+        markFilled: {
+            padding: '2px',
+        }
     })
 }
 
@@ -91,7 +111,20 @@ export const wrapUIProvider = (node: React.ReactNode) => (
                     },
                     
                 })
-            }
+            },
+            Switch: {
+                styles: (theme: any) => ({
+                    input: {
+                        backgroundColor: `${theme.colors.bg[0]}`,
+                        ':hover': {
+                            cursor: 'pointer'
+                        },
+                        borderColor: 'rgba(0, 0, 0, 0)'
+                    }
+                })
+            },
+            Slider: SliderStyles,
+            RangeSlider: SliderStyles
         }}
     >
         {node}
