@@ -31,6 +31,7 @@ export const Filter: FunctionComponent<Props> = ({ filter, updateFilter, chopSum
             <FilterPitch 
                 classes={filter.pitch?.classes ?? []}
                 nonstrict={!!filter.pitch?.nonstrict}
+                pm={filter.pitch?.pm ?? 0}
                 octaves={filter.pitch?.octaves}
                 updatePitch={(d, local) => updateFilter('pitch', d, local)}
                 soloMode={soloMode}

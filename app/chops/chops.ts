@@ -7,6 +7,9 @@ import { range } from 'util/range';
 import { NumericComparison } from 'util/types/numeric';
 import Fuse from 'fuse.js'
 
+import { PITCH_TO_NUMBER, NUMBER_TO_PITCH } from "../util/pitch"
+export { PITCH_TO_NUMBER, NUMBER_TO_PITCH }
+
 export type ChopPosIndex = number
 
 export type ChopPosRegion = { 
@@ -103,6 +106,14 @@ export type ChopSelection = {
     file?: string
 }
 
+export const chopSelectionFilenameBase = (curr: ChopSelection): string => {
+    const file_pitches = curr.chopFile.chops.slice(curr.fragmentIndex, curr.fragmentIndex + curr.fragmentLength)
+        .flatMap(frag => frag.pitches)
+        .map(p => NUMBER_TO_PITCH[p.class] + p.octave.toString())
+        .join('_')
+
+    return `${curr.speakers.join('-')}_${curr.speech}${file_pitches ? `_${file_pitches}` : ''}`
+}
 export const regionContains = (region: ChopPosRegion, index: ChopPosIndex|ChopPosRegion) => {
     const indexPos = (typeof index === 'object') ? index.start : index
 
@@ -194,7 +205,7 @@ export const expandSelection = (selection: ChopSelection, direction: 'right'|'le
     const fragments = selection.chopFile.chops
 
     const startpos = selection.fragmentIndex + (direction === 'left' ? -1 : 0)
-    const endpos = startpos + selection.fragmentLength + (direction === 'left' ? -1 : 0)
+    const endpos = selection.fragmentIndex + selection.fragmentLength + (direction === 'right' ? 1 : 0)
 
     if(startpos >= 0 && endpos < fragments.length) {
         return fragmentsToSelection(selection.fileIndex, selection.chopFile, fragments.slice(startpos, endpos), selection.chopFile.words, startpos, selection.fragmentLength + 1)
@@ -323,30 +334,6 @@ type CueType = (
         pos: ChopPosRegion,
     }
 )
-
-const PITCH_TO_NUMBER: Record<string, number> = {
-    'cb': 12,
-    'c': 1,
-    'c#': 2,
-    'db': 2,
-    'd': 3,
-    'd#': 4,
-    'eb': 4,
-    'e': 5,
-    'e#': 6,
-    'fb': 5,
-    'f': 6,
-    'f#': 7,
-    'gb': 7,
-    'g': 8,
-    'g#': 9,
-    'ab': 9,
-    'a': 10,
-    'a#': 11,
-    'bb': 11,
-    'b': 12,
-    'b#': 1
-}
 
 function parsePitchArg(arg: string): ChopPitch[] {
     const res: ChopPitch[] = []
@@ -504,7 +491,7 @@ function getAllChopSelections(file: ChopFile, fileIndex: number): ChopSelection[
     while( i < file.gaps.length && j < file.chops.length ) {
         const chunk: ChopFragment[] = []
 
-        while(file.chops[j].pos.start <= file.gaps[i]) {
+        while(j < file.chops.length && file.chops[j].pos.start <= file.gaps[i]) {
             chunk.push(file.chops[j])
 
             j++

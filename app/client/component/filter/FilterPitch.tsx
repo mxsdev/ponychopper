@@ -1,4 +1,4 @@
-import { Box, Checkbox, Grid, NativeSelect, Space, Switch } from "@mantine/core"
+import { Box, Checkbox, Grid, NativeSelect, NumberInput, Space, Switch } from "@mantine/core"
 import { FilterUpdate } from "client/util/localFilter"
 import { useModifierKeys } from "client/util/modifierKeys"
 import React, { FunctionComponent } from "react"
@@ -12,6 +12,8 @@ import { FilterSubheader } from "./FilterSubheader"
 type Props = {
     classes: (number|undefined)[],
     octaves: NumericComparison|undefined,
+    pm: number,
+
     updatePitch: FilterUpdate<'pitch'>,
     nonstrict: boolean,
     soloMode: boolean
@@ -19,12 +21,16 @@ type Props = {
 
 const PitchKeyValues = PitchKeys.map((_, i) => i+1)
 
-export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, updatePitch, nonstrict, soloMode }) => {
+export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, updatePitch, nonstrict, soloMode, pm }) => {
     const updateClasses = (checked: boolean, key: number|undefined) => updatePitch({
         classes: includeElement(classes, key, checked, {
             soloMode, full: [...PitchKeyValues, undefined]
         })
     })
+
+    const updatePM = (pm: number = 0) => {
+        updatePitch({ pm })
+    }
 
     return (<>
         <FilterSection header="Pitch">
@@ -48,7 +54,7 @@ export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, update
             <Space h='xs' />
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={(theme) => ({display: 'flex', gap: theme.spacing.xl})}>
+                <Box sx={(theme) => ({display: 'flex', gap: theme.spacing.sm})}>
                     <Checkbox 
                         size='xs'
                         label='None'
@@ -64,6 +70,29 @@ export const FilterPitch: FunctionComponent<Props> = ({ classes, octaves, update
                         onChange={({target: { checked }}) => updatePitch({ nonstrict: !checked })}
 
                         label='Strict'
+                    />
+
+                    <NumberInput 
+                        size='xs'
+
+                        value={pm}
+                        onChange={updatePM}
+
+                        // label='PM'
+
+                        sx={{
+                            maxWidth: '50px'
+                        }}
+
+                        // styles={(theme) => ({
+                        //     wrapper: {
+                        //         maxWidth: '50px',
+                        //     },
+                        //     label: {
+                        //         marginLeft: theme.spacing.xs,
+                        //         marginBottom: '0'
+                        //     }
+                        // })}
                     />
                 </Box>
 

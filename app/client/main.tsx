@@ -44,7 +44,7 @@ export default ((props) => {
 
     const { settingsOpened, toggleSettings, ...settings} = useSettings()
 
-    const { chop, prev, next, expandSelection, loading: filesLoading, chopsEnabled, chopSummary } = useChops()
+    const { chop, prev, next, expandSelection, loading: filesLoading, chopsEnabled, chopSummary, selection } = useChops()
 
     const loading = chopLoading || filesLoading
 
@@ -80,6 +80,7 @@ export default ((props) => {
                 <Space h='sm' />
 
                 <ChopSection 
+                    selection={selection}
                     chop={chop} prev={prev} next={next}
                     chopLoading={chopLoading}
                     chopsAvailable={chopsAvailable}
@@ -87,7 +88,7 @@ export default ((props) => {
                     startDrag={startDrag} 
                 />
 
-                <Space h='xs' />
+                {/* <Space h='xs' /> */}
 
             </Box>
         

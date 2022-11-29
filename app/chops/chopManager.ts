@@ -3,7 +3,7 @@ import { getWaveMeta, WaveMeta } from '../util/riff'
 import { exists, getFilesRecursively } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
-import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator, expandSelection } from './chops'
+import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator, expandSelection, NUMBER_TO_PITCH, chopSelectionFilenameBase } from './chops'
 import path from 'path'
 import fs from 'fs'
 import EventEmitter from 'events'
@@ -170,6 +170,7 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
         return buff
     }
 
+    // TODO: move this to another file
     async writeFile(dir: string) {
         const curr = this.current()
 
@@ -182,13 +183,19 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
             if(old_file_exists) return old_file
         }
 
-        const uuid = this.uuid.generate().toString()
+        const filename_base = chopSelectionFilenameBase(curr)
 
-        const filename = `${curr.speakers.join('-')}_${curr.speech}_${uuid}.wav`
+        let exists_index = 0
+
+        const get_filename = () => `${filename_base}${exists_index ? `_${exists_index}` : ''}.wav`
+
+        while(await exists(path.join(dir, get_filename()))) {
+            exists_index++
+        }
 
         const buff = await this.buffer(false)
 
-        const filepath = path.join(dir, filename)
+        const filepath = path.join(dir, get_filename())
 
         await fs.promises.writeFile(filepath, buff)
 

@@ -25,7 +25,10 @@ const CFG_REACT_MAIN: webpack.Configuration = {
         extensions: [ '.tsx', '.jsx', '.ts', '.js', '.css' ],
         plugins: [
             new TsconfigPathsPlugin()
-        ]
+        ],
+        fallback: {
+            path: require.resolve('path-browserify'),
+        }
     },
     module: {
         rules: [

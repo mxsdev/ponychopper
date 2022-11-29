@@ -1,14 +1,19 @@
 import { useChopFileSummary } from './fileSummary';
-import { ChopFileSummary, FilterOpts } from "chops/chops"
+import { ChopFileSummary, ChopSelection, FilterOpts } from "chops/chops"
 import { AddEventListener, PCEventListener, RemoveEventListener } from "client/event/events"
 import { useEffect, useState } from "react"
+import { useEvent } from './event';
 
 export const useChops = () => {
     const { loading, chopSummary, chopsEnabled } = useChopFileSummary()
 
+    const [ selection, setSelection ] = useState<ChopSelection|null>(null)
+
     useEffect(() => {
         api.signalReady('main')
     }, [])
+    
+    useEvent("chop_selection", ({ detail: {selection: s} }) => setSelection(s))
 
     const chop = () => {
         if(!chopsEnabled) {
@@ -31,6 +36,8 @@ export const useChops = () => {
         chop,
         prev,
         next,
-        expandSelection
+        expandSelection,
+
+        selection
     }
 }
