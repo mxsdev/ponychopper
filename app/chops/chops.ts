@@ -148,7 +148,7 @@ export function chopFileSummary(files: ChopFile[]): ChopFileSummary {
         speakers: [...new Set<string|undefined>(files.flatMap(f => f.chops.flatMap(f => f.speakers)))],
         fileNames: files.map(file => fileBaseName(file)),
         meta: {
-            seasons: files.map(file => file.meta.season)
+            seasons: [...new Set(files.map(file => file.meta.season))]
         }
     })
 }
