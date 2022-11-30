@@ -11,11 +11,11 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import ReactRefreshTypeScript from 'react-refresh-typescript'
 
-const { ELECTRON_MAIN, DIST_INDEX_HTML, DIST_PRELOAD, DIR_APP, DIR_DIST, DIST_ELECTRON_MAIN, REACT_MAIN, DIR_CSS, HTML_MAIN, DIST_DIR_HTML, DIST_REACT_MAIN, PRELOAD, DIST_PUBLIC } = PROJECT_PATHS
+const { REACT_DOCS, DIR_APP, DIR_DOCS, DIR_CSS, HTML_DOCS, DIR_DIST_DOCS, DIST_DOCS_REACT_MAIN, DIST_DOCS_INDEX_HTML } = PROJECT_PATHS
 
 const CFG_REACT_MAIN: webpack.Configuration = {
     mode: WEBPACK_MODE,
-    entry: REACT_MAIN,
+    entry: REACT_DOCS,
     devtool: 'eval-source-map',
     target: ['web', 'electron-renderer'],
     resolve: {
@@ -31,7 +31,10 @@ const CFG_REACT_MAIN: webpack.Configuration = {
         rules: [
             {
                 test: /\.ts(x?)$/,
-                include: DIR_APP,
+                include: [
+                    DIR_APP,
+                    DIR_DOCS,
+                ],
                 use: [{ 
                     loader: 'ts-loader',
                     options: {
@@ -55,10 +58,10 @@ const CFG_REACT_MAIN: webpack.Configuration = {
         ...(DO_HMR ? [new ReactRefreshWebpackPlugin()]: []),
         new HTMLWebpackPlugin({
             templateContent: util.format(
-                fs.readFileSync(HTML_MAIN).toString(), 
-                path.relative(DIST_DIR_HTML, DIST_REACT_MAIN)
+                fs.readFileSync(HTML_DOCS).toString(), 
+                DIST_DOCS_REACT_MAIN,
             ),
-            filename: DIST_INDEX_HTML,
+            filename: DIST_DOCS_INDEX_HTML,
             inject: false,
         }),
         new DefinePlugin({
@@ -68,9 +71,9 @@ const CFG_REACT_MAIN: webpack.Configuration = {
     ],
     stats: 'minimal',
     output: {
-        path: DIR_DIST,
+        path: DIR_DIST_DOCS,
         // publicPath: DIST_PUBLIC,
-        filename: DIST_REACT_MAIN
+        filename: DIST_DOCS_REACT_MAIN
     },
     devServer: {
         hot: true,

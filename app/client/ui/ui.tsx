@@ -59,6 +59,22 @@ export const wrapUIProvider = (node: React.ReactNode) => (
             Button: (theme) => ({
                 filled: {
                     boxShadow: theme.shadows['sm']
+                },
+                subtle: {
+                    '&:hover': {
+                        backgroundColor: 'rgba(1, 1, 1, 0.05)',
+                    },
+                },
+                outline: {
+                    '&:hover': {
+                        backgroundColor: 'rgba(1, 1, 1, 0.05)',
+                    },
+                },
+                light: {
+                    backgroundColor: 'rgba(1, 1, 1, 0.05)',
+                    '&:hover': {
+                        backgroundColor: 'rgba(1, 1, 1, 0.075)',
+                    },
                 }
             }),
             Tabs: (theme) => ({

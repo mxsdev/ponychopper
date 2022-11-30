@@ -18,6 +18,7 @@ import { SettingsHotkeys } from "./component/settings/SettingsHotkeys"
 import { SettingsTheme } from "./component/settings/SettingsTheme"
 import { SettingsTabs } from "./component/settings/SettingsTabs"
 import { SettingsInfo } from "./component/settings/SettingsInfo"
+import { PROJECT_ISSUES } from "util/url"
 
 type Props = {
     
@@ -70,7 +71,7 @@ export const Settings: FunctionComponent<Props> = (props) => {
                     info: (
                         <SettingsInfo
                             version={APP_VERSION}
-                            issueHref={`${APP_REPOSITORY_URL}/issues`}
+                            issueHref={PROJECT_ISSUES}
                         />
                     )
                 }}
