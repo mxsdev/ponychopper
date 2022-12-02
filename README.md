@@ -38,9 +38,17 @@ Note that filter values are determined based on [cue points](#audio-format).
 
 Within filtering options, there are many range sliders, each having a switch next to it.
 
-When the switch is on, the slider is in *range mode*, and allows for any value within the range.
+When the switch is on, the slider is in *range mode*, and allows for any value within the range:
+
+<p align="center">
+  <img width="360" alt="image" src="https://user-images.githubusercontent.com/16108792/205401737-f9a86e36-7cd9-4bac-b566-d699fe682268.png">
+</p>
 
 When the switch is off, the slider is in *value mode*, and allows for only the selected value.
+
+<p align="center">
+  <img width="360" alt="image" src="https://user-images.githubusercontent.com/16108792/205401836-219e9896-7909-49d2-9cc5-3ca50e41ff4f.png">
+</p>
 
 ### Filtering by Pitch
 
@@ -50,17 +58,33 @@ Hold Command (macOS) or Control (Windows/Linux) to solo a specific pitch. This w
 
 #### Strict Mode
 
+<p align="center">
+<img width="360" alt="image" src="https://user-images.githubusercontent.com/16108792/205402166-cabbdf67-75e3-4798-b2d9-fe085019f602.png">
+</p>
+  
 If in strict-mode, in the case of a chop with multiple pitches, this option will allow for only the chops for which every pitch passes the error range. Conversely, if not in strict mode, only one pitch needs to pass.
 
 #### Pitch ±
+
+<p align="center">
+<img width="360" alt="image" src="https://user-images.githubusercontent.com/16108792/205402260-c4ef8753-9c13-4c1b-a37f-925076915092.png">
+</p>
 
 Allows an "error" range for semi-tones. So, a pm value of `1` will allow all pitches to vary +/- 1 semitone from the selected pitches.
 
 #### Set Key
 
+<p align="center">
+<img width="360" alt="image" src="https://user-images.githubusercontent.com/16108792/205402280-7495eba1-eebd-49ff-984a-8e2a4eb938b7.png">
+</p>
+  
 Convenience tool for only allowing pitches that come from a specific key.
 
 ### Filter Search
+
+<p align="center">
+<img width="352" alt="image" src="https://user-images.githubusercontent.com/16108792/205402500-f926a803-3887-4e50-805e-ef3331557ac9.png">
+</p>
 
 Filter search allows you to filter by the spoken text of a chop. Three search options are supported:
 
@@ -69,6 +93,7 @@ Filter search allows you to filter by the spoken text of a chop. Three search op
 * **RegEx**: Allows searching by a user-provided [regular expression][regexp]
 
 [regexp]: https://en.wikipedia.org/wiki/Regular_expression
+[fuzzy]: https://en.wikipedia.org/wiki/Approximate_string_matching
 
 ## Settings
 
