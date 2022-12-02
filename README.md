@@ -1,5 +1,9 @@
 # ponychopper
 
+<p align="center">
+  <img width="554" alt="Screen Shot 2022-12-02 at 4 37 25 PM" src="https://user-images.githubusercontent.com/16108792/205401498-7638d9d2-26bc-4755-b246-ad6ac8924ad0.png">
+</p>
+
 Ponychopper is a desktop application developed to improve the workflow of composing sample-based music genres such as [plunderphonics][plunderphonics] and hip-hop.
 
 It works by randomly iterating through a user-defined list of [chop regions](#notating-a-file) and filtering by user provided filter options. This allows the musician to rapidly cycle through possibilities without deviating from certain restrictions (such as staying within a certain key).
