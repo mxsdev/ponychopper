@@ -8,6 +8,7 @@ import { NumericComparison } from 'util/types/numeric';
 import Fuse from 'fuse.js'
 
 import { PITCH_TO_NUMBER, NUMBER_TO_PITCH } from "../util/pitch"
+import { withHandle } from 'util/file';
 export { PITCH_TO_NUMBER, NUMBER_TO_PITCH }
 
 export type ChopPosIndex = number
@@ -262,17 +263,18 @@ export const fragmentsToSelection = (fileIndex: number, chopFile: ChopFile, frag
 }
 
 export async function selectionToBuffer(selection: ChopPosRegion, file: PathLike): Promise<Buffer> {
-    const handle = await fs.open(file, 'r')
-    const size = (await handle.stat()).size
-
-    const {fmt, data} = await getWaveSampleRange(handle, size, selection.start, selection.length)
-
-    await handle.close()
-
-    const writer = new WaveWriter(fmt, { numSamples: selection.length }, data)
-        .setTag('ICMT', 'Created with ponychopper.')
-
-    return writer.toBuffer()
+    return await withHandle(fs.open(file, 'r'), async (handle) => {
+        const size = (await handle.stat()).size
+    
+        const {fmt, data} = await getWaveSampleRange(handle, size, selection.start, selection.length)
+    
+        await handle.close()
+    
+        const writer = new WaveWriter(fmt, { numSamples: selection.length }, data)
+            .setTag('ICMT', 'Created with ponychopper.')
+    
+        return writer.toBuffer()
+    })
 }
 
 type WaveRegion = ({ label: string, position: number }&({type: 'marker'}|{type: 'region', length: number}))

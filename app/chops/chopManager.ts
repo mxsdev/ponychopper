@@ -1,6 +1,6 @@
 import type { PathLike } from 'fs'
 import { getWaveMeta, WaveMeta } from '../util/riff'
-import { exists, getFilesRecursively } from '../util/file'
+import { exists, getFilesRecursively, withHandle } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'
 import { ChopFile, ChopSelection, regionContains, regionUnion, fragmentsToSelection, waveMetaToChopFile, selectionToBuffer,  createChopSelectorGenerator, FilterOpts, chopFileSummary, ChopFileSummary, ChopSelector, ChopSelectorGenerator, expandSelection, NUMBER_TO_PITCH, chopSelectionFilenameBase } from './chops'
@@ -73,9 +73,7 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
             const extname = path.extname(f).toLowerCase()
             if(extname !== '.wav') return
 
-            const handle = await fs.promises.open(f, 'r')
-
-            try {
+            await withHandle(fs.promises.open(f, 'r'), async (handle) => {
                 const { size } = await handle.stat()
                 const meta = await getWaveMeta(handle, size)
 
@@ -84,11 +82,9 @@ export class ChopFileManager extends (EventEmitter as TypedEmitterInstance<ChopF
                 const cf = waveMetaToChopFile(meta, f)
 
                 this.files.push(cf)
-            } catch(e) {
+            }).catch((e) => {
                 console.error(`Failure reading wave file ${path.basename(f)}`, e)
-            }
-            
-            await handle.close()
+            })
         }))
 
         this.empty()

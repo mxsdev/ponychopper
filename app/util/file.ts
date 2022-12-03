@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import fs from 'fs'
+import { FileHandle } from 'fs/promises'
 // import type { PathLike } from 'fs'
 
 export async function getFilesRecursively(dir: string): Promise<string[]> {
@@ -20,5 +21,18 @@ export async function exists(file: fs.PathLike) {
 export function ensure_exists(dir: string) {
     if (!fs.existsSync(dir)){
         fs.mkdirSync(dir, { recursive: true });
+    }
+}
+
+export async function withHandle<R>(handlePromise: Promise<FileHandle>, func: (handle: FileHandle) => Promise<R>): Promise<R> {
+    const handle = await handlePromise
+
+    try {
+        return await func(handle)
+    } catch(e) {
+        await handle.close()
+        throw e
+    } finally {
+        await handle.close()
     }
 }
