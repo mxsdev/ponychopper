@@ -36,7 +36,7 @@
           "name": "@electron-forge/maker-deb",
           "config": {
             "options": {
-              "icon": "./assets/horse_1024.png"
+              "icon": "./assets/horse_512.png"
             }
           }
         },
