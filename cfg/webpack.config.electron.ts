@@ -13,7 +13,7 @@ const { ELECTRON_MAIN, DIST_INDEX_HTML, DIST_PRELOAD, DIR_APP, DIR_DIST, DIST_EL
 /**
  * Compat for windows, which has backslash path separators
  */
-const toURL = (val: string) => val.replace(/\\/g, "")
+const toURL = (val: string) => val.replace(/\\/g, "/")
 
 const WATCH_OPTS: webpack.Configuration['watchOptions'] = {
     ignored: ['**/node_modules'],
