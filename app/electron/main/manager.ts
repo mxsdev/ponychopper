@@ -6,6 +6,7 @@ import fs from 'fs'
 import path from 'path'
 import { IPCMainHandle, IPCMainListen, IPCMainSend } from "electron/ipc/ipcmain";
 import { UserSettingsManager } from "./settings";
+import { ICON_HORSE } from "./static";
 
 export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager, userSettings: UserSettingsManager) {
     const manager = new ChopFileManager()
@@ -23,7 +24,7 @@ export function registerChopManager(ipc: typeof ipcMain, windows: WindowManager,
             .then((file) => {
                 event.sender.startDrag({
                     file,
-                    icon: '/Users/maxstoumen/Projects/ponychopper/assets/horse.png'
+                    icon: ICON_HORSE[64]
                 })
             })
     })

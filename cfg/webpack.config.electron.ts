@@ -6,9 +6,9 @@ import HTMLWebpackPlugin from 'html-webpack-plugin'
 import webpack, { DefinePlugin } from 'webpack'
 import { PROJECT_PATHS } from './webpack.config.paths'
 import { IS_DEVELOPER, WEBPACK_MODE } from './webpack.config.env'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 
-
-const { ELECTRON_MAIN, DIST_INDEX_HTML, DIST_PRELOAD, DIR_APP, DIR_DIST, DIST_ELECTRON_MAIN, REACT_MAIN, DIR_CSS, HTML_MAIN, DIST_DIR_HTML, DIST_REACT_MAIN, PRELOAD } = PROJECT_PATHS
+const { ELECTRON_MAIN, DIST_INDEX_HTML, DIST_PRELOAD, DIR_APP, DIR_DIST, DIST_ELECTRON_MAIN, REACT_MAIN, DIR_CSS, HTML_MAIN, DIST_DIR_HTML, DIST_REACT_MAIN, PRELOAD, DIR_ASSETS } = PROJECT_PATHS
 
 const WATCH_OPTS: webpack.Configuration['watchOptions'] = {
     ignored: ['**/node_modules'],
@@ -31,6 +31,9 @@ const CFG_ELECTRON_MAIN: webpack.Configuration = {
             DIST_PRELOAD: `"${DIST_PRELOAD}"`,
             DEV_MODE: IS_DEVELOPER
         }),
+        new CopyWebpackPlugin({ 
+            patterns: [{ from: DIR_ASSETS, to: "static" }]
+        })
     ],
     module: {
         rules: [

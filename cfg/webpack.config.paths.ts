@@ -2,6 +2,7 @@ import path from 'path'
 
 const DIR_ROOT = path.join(__dirname, '../')
 
+const DIR_ASSETS = path.join(DIR_ROOT, 'assets')
 const DIR_DIST = path.join(DIR_ROOT, 'dist')
 const DIR_APP  = path.join(DIR_ROOT, 'app')
 const DIR_DOCS = path.join(DIR_APP, 'docs')
@@ -42,7 +43,7 @@ const CSS_DOCS = CSS_MAIN
 const HTML_DOCS = path.join(DIR_DOCS, 'index.html')
 
 export const PROJECT_PATHS = {
-    DIR_DIST, DIR_APP, DIR_CSS, DIR_DOCS, DIR_DIST_DOCS,
+    DIR_DIST, DIR_APP, DIR_CSS, DIR_DOCS, DIR_DIST_DOCS, DIR_ASSETS,
 
     ICON_NAME, ICON,
 

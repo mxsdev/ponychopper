@@ -4,6 +4,7 @@ import { ELECTRON_CONFIG } from "electron/config";
 import path from 'path'
 import { TypedEmitterInstance } from 'util/emitter';
 import { IPCMainListen, IPCMainSend, IPCMainUnlisten } from 'electron/ipc/ipcmain';
+import { ICON_HORSE } from './static';
 
 export type WindowType = 'main'|'settings'
 
@@ -19,7 +20,11 @@ function createWindow(opts: { width: number, height: number, minWidth?: number, 
             preload: path.join(__dirname, DIST_PRELOAD)
         },
         parent: opts.parent,
-        show: opts.show ?? true
+        show: opts.show ?? true,
+
+        icon: ICON_HORSE.ico,
+
+        title: "🔪🐴",
     })
 
     win.setMenuBarVisibility(false)
