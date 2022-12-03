@@ -1,7 +1,7 @@
 {
   "name": "ponychopper",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Audio utility for sample-based music",
   "main": "dist/main.js",
   "repository": "https://github.com/mxsdev/ponychopper",
   "scripts": {
@@ -16,7 +16,8 @@
     "build:electron": "cross-env NODE_ENV=production webpack -c ./cfg/webpack.config.electron.ts",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "keywords": [],
   "private": true,
@@ -79,6 +80,7 @@
     "browser-sync-webpack-plugin": "^2.3.0",
     "chai": "^4.3.6",
     "concurrently": "^7.1.0",
+    "conventional-changelog-cli": "^2.2.2",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.1",
