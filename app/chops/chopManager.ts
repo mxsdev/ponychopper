@@ -1,5 +1,5 @@
 import type { PathLike } from 'fs'
-import { getWaveMeta, WaveMeta } from '../util/riff'
+import { getWaveMeta, WaveMeta } from 'riff-handle'
 import { exists, getFilesRecursively, withHandle } from '../util/file'
 import { arrayRandom, randomInteger } from '../util/random'
 import { range } from '../util/range'

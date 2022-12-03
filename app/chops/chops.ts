@@ -1,5 +1,5 @@
 import { getContiguousSubarrays, shuffle } from './../util/arrays';
-import { getWaveSampleRange, WaveMeta, WaveWriter } from "../util/riff"
+import { getWaveSampleRange, WaveMeta, WaveWriter } from "riff-handle"
 import fs from 'fs/promises'
 import type { PathLike } from 'fs'
 import { fileBaseNameNoExt } from 'util/path';

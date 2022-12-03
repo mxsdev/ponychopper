@@ -4620,6 +4620,11 @@ reusify@^1.0.4:
   resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.0.4.tgz#90da382b1e126efc02146e90845a88db12925d76"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
+riff-handle@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/riff-handle/-/riff-handle-1.0.1.tgz#07b97baa56b9ff2e6085ef46a4af5d43cc08fbe9"
+  integrity sha512-E4sCM/i+R4hJfLeTMeIV5+FdnQZPDc0sPlTnApsyYaZqaXzMP0FXiUeZc/ECffkzGxPLtWcSyhN5WripWC8fJA==
+
 rimraf@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
