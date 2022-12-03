@@ -1,5 +1,5 @@
 {
-  "name": "horsechops",
+  "name": "ponychopper",
   "version": "0.0.0",
   "description": "",
   "main": "dist/main.js",
@@ -22,7 +22,9 @@
   "private": true,
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "./assets/horse"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
