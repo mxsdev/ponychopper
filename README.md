@@ -26,6 +26,10 @@ Click the knife button or press `C` on your keyboard.
 
 ### Use a Chop
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/16108792/205450049-28feffeb-b157-420a-9052-8491b8b4fa86.gif">
+</p>
+
 To use a chop in your music software, simply click and drag!
 
 ## Filtering
