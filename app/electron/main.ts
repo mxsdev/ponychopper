@@ -34,12 +34,12 @@ IPCMainHandle('get_folder', (event, opts) => {
     const windowFrom = windowManager.findWindow(event.sender.id)
     if(!windowFrom) throw new Error('Window not found')
 
-    console.log(opts)
+    const defaultDirectory = opts?.type === "chop" ? userSettings.get('chopDir') : opts?.type === "src" ? userSettings.get('srcDir') : undefined
 
     return dialog.showOpenDialog(windowFrom, {
         properties: [ 'openDirectory' ],
         title: opts?.title,
-        defaultPath: opts?.defaultDirectory,
+        defaultPath: opts?.defaultDirectory ?? defaultDirectory,
     })
 })
 

@@ -30,7 +30,7 @@ export const useUserSettings = () => {
         })
     }
 
-    const setDirectory = (type: 'src'|'chop') => getDirectory()
+    const setDirectory = (type: 'src'|'chop') => getDirectory({ type })
         .then(({path}) => {
             if(!path) return
 
