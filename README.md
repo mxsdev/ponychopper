@@ -99,6 +99,10 @@ Filter search allows you to filter by the spoken text of a chop. Three search op
 
 ### Directory
 
+<p align="center">
+  <img width="664" alt="image" src="https://user-images.githubusercontent.com/16108792/205448438-151afc12-d21d-44aa-9ded-297b414a1e94.png">
+</p>
+
 You can choose a source directory and output directory. 
 
 The source directory should contain `wav` files formatted as per [audio format](#audio-format).
@@ -107,7 +111,15 @@ The output directory will be written to as-needed when chops are dragged. Curren
 
 ### Hotkeys
 
+<p align="center">
+  <img width="669" alt="image" src="https://user-images.githubusercontent.com/16108792/205448529-d37a873d-2692-412d-a7eb-c85c4a7cabfc.png">
+</p>
+
 Hotkeys are currently supported for `Play/Pause`, `Chop`, `Previous/Next Chop`, `Replay`, and `Expand Left/Right`
+
+#### Global Shortcuts
+
+Ponychopper supports global shortcuts, which becomes very useful for pairing with another audio software, such as a DAW.
 
 #### Expand Left/Right
 
@@ -115,11 +127,11 @@ Expand left/right "expands" the selection in either direction. So, for example, 
 
 ### Pin
 
+<p align="center">
+  <img width="240" alt="image" src="https://user-images.githubusercontent.com/16108792/205448683-46f09bf0-2073-44cd-8d4d-3c2bb2cfac4e.png">
+</p>
+
 Simply click the "pin" icon in the top left to force the window to always be on top. This is very useful for usage with another audio software.
-
-#### Global Shortcuts
-
-Ponychopper supports global shortcuts, which becomes very useful for pairing with another audio software, such as a DAW.
 
 ## Audio Format
 
