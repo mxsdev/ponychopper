@@ -10,6 +10,11 @@ import CopyWebpackPlugin from 'copy-webpack-plugin'
 
 const { ELECTRON_MAIN, DIST_INDEX_HTML, DIST_PRELOAD, DIR_APP, DIR_DIST, DIST_ELECTRON_MAIN, REACT_MAIN, DIR_CSS, HTML_MAIN, DIST_DIR_HTML, DIST_REACT_MAIN, PRELOAD, DIR_ASSETS } = PROJECT_PATHS
 
+/**
+ * Compat for windows, which has backslash path separators
+ */
+const toURL = (val: string) => val.replace(/\\/g, "")
+
 const WATCH_OPTS: webpack.Configuration['watchOptions'] = {
     ignored: ['**/node_modules'],
 }
@@ -27,8 +32,8 @@ const CFG_ELECTRON_MAIN: webpack.Configuration = {
     stats: 'minimal',
     plugins: [
         new DefinePlugin({
-            DIST_INDEX_HTML: `"${DIST_INDEX_HTML}"`,
-            DIST_PRELOAD: `"${DIST_PRELOAD}"`,
+            DIST_INDEX_HTML: `"${toURL(DIST_INDEX_HTML)}"`,
+            DIST_PRELOAD: `"${toURL(DIST_PRELOAD)}"`,
             DEV_MODE: IS_DEVELOPER
         }),
         new CopyWebpackPlugin({ 
