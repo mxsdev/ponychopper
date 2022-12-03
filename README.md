@@ -14,7 +14,7 @@ This vastly improves the workflow experience and allows the musician to focus on
 
 ## Installation
 
-Install ponychopper on the [releases][releases] page, selecting the binary for your operating system.
+Install ponychopper through the [releases][releases] page, where you'll find the binary for your operating system.
 
 [releases]: https://github.com/mxsdev/ponychopper/releases
 
@@ -141,6 +141,10 @@ Currently, only `.wav` files are supported.
 
 ## Notating a File
 
+<p align="center">
+  <img width="725" alt="image" src="https://user-images.githubusercontent.com/16108792/205448892-4bd97921-f906-4a29-a3d6-7eb5c733c756.png">
+</p>
+
 In order to notate a file, you'll have to use an editor that supports wav regions. The easiest to use is [Image-Line's Edison][edison], which can be used for free with the trial version of [FL Studio][flstudio].
 
 [edison]: https://www.image-line.com/fl-studio-news/edison-tutorial-1-of-6/
@@ -182,7 +186,7 @@ Prevents a chop from forming in such a way that it crosses this sample. Use this
 
 #### `@char`
 
-Indicates a certain speaker or character.
+Indicates a certain speaker or character. Applies to all audio segments within the region.
 
 #### `@meta`
 
