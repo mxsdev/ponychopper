@@ -15,6 +15,7 @@
     "build": "concurrently -n ui,electron \"yarn build:ui\" \"yarn build:electron\"",
     "build:ui": "cross-env NODE_ENV=production webpack -c ./cfg/webpack.config.ui.ts",
     "build:electron": "cross-env NODE_ENV=production webpack -c ./cfg/webpack.config.electron.ts",
+    "build:docs": "webpack -c ./cfg/webpack.config.docs.ts -o ./docs",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
